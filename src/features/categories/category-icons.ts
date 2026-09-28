@@ -1,0 +1,30 @@
+import {
+  Banknote,
+  Car,
+  Gamepad2,
+  Gift,
+  HeartPulse,
+  Home,
+  Landmark,
+  MoreHorizontal,
+  Repeat,
+  Shirt,
+  TrendingUp,
+  Utensils,
+  type LucideIcon,
+} from "lucide-react"
+
+export const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  banknote: Banknote,
+  utensils: Utensils,
+  "gamepad-2": Gamepad2,
+  "heart-pulse": HeartPulse,
+  shirt: Shirt,
+  gift: Gift,
+  car: Car,
+  landmark: Landmark,
+  home: Home,
+  repeat: Repeat,
+  "trending-up": TrendingUp,
+  "more-horizontal": MoreHorizontal,
+}
