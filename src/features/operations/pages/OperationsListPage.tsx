@@ -7,9 +7,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useAuth } from "@/hooks/useAuth"
-import { firebaseCategoryService } from "@/services/firebase/category.service"
 import { firebaseOperationService } from "@/services/firebase/operation.service"
-import type { Category, Operation } from "@/types"
+import { useCategories } from "@/hooks/useCategories"
+import type { Operation } from "@/types"
 
 const PAGE_SIZE = 25
 
@@ -20,8 +20,8 @@ type SortOption = "date-desc" | "date-asc" | "amount-desc" | "amount-asc"
 export function OperationsListPage() {
   const { user } = useAuth()
   const [operations, setOperations] = useState<Operation[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
+  const { categories, categoryById, loading: categoriesLoading } = useCategories()
 
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
@@ -31,13 +31,10 @@ export function OperationsListPage() {
 
   useEffect(() => {
     if (!user) return
-    Promise.all([firebaseOperationService.list(user.id), firebaseCategoryService.list(user.id)]).then(
-      ([operationsResult, categoriesResult]) => {
-        setOperations(operationsResult)
-        setCategories(categoriesResult)
-        setLoading(false)
-      },
-    )
+    firebaseOperationService.list(user.id).then((result) => {
+      setOperations(result)
+      setLoading(false)
+    })
   }, [user])
 
   function updateTypeFilter(value: "all" | "income" | "expense") {
@@ -54,8 +51,6 @@ export function OperationsListPage() {
     setMonthFilter(value)
     setPage(1)
   }
-
-  const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories])
 
   const filtered = useMemo(() => {
     return operations
@@ -129,11 +124,11 @@ export function OperationsListPage() {
         </Select>
 
         <Button asChild className="ml-auto">
-          <Link to="/operations/nouveau">Ajouter</Link>
+          <Link to="/operations/new">Ajouter</Link>
         </Button>
       </div>
 
-      {loading ? (
+      {loading || categoriesLoading ? (
         <p className="mt-6 text-muted-foreground">Chargement…</p>
       ) : (
         <Card className="mt-6">

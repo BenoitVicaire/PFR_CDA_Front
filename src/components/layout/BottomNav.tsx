@@ -26,7 +26,7 @@ export function BottomNav() {
         <BottomNavLink key={item.to} {...item} />
       ))}
       <NavLink
-        to="/operations/nouveau"
+        to="/operations/new"
         className="flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md"
         aria-label="Ajouter une opération"
       >
