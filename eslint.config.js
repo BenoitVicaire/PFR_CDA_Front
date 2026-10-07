@@ -19,4 +19,10 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Composants shadcn générés : ils exportent aussi leurs variantes `cva`
+    // (buttonVariants, toggleVariants…). On ne modifie pas ces fichiers.
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ])

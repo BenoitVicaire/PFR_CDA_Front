@@ -60,7 +60,7 @@ function budgetStatusClasses(percent: number) {
 function BalanceBlock({currentBalance,previousBalance,currentMonth,previousMonth}:{currentBalance:number,previousBalance:number,currentMonth:Date,previousMonth:Date}){
 	const monthYearString= currentMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
 	const previousMonthLabel = previousMonth.toLocaleDateString("fr-FR", { month: "long" })
-	console.log("current balance:",currentBalance,"Previous",previousBalance)
+	
 	return (
 		<>
 		<p className="text-xl text-primary font-medium tracking-widest text-center uppercase">{monthYearString}</p>
@@ -93,7 +93,7 @@ export function DashboardPage() {
 
 	const lastMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
 	const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
-	console.log("lastmonth",lastMonth)
+	
 
 	const totalIncomeForCurrentMonth=totalTypeForMonth(operations,"income",currentMonth)
 	const totalExpenseForCurrentMonth=totalTypeForMonth(operations,"expense",currentMonth)
