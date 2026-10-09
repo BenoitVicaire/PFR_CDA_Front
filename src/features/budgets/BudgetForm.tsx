@@ -1,7 +1,10 @@
+import type { BudgetFormProps } from "@/types/budget";
 
-export function BudgetForm(){
-
+export function BudgetForm({defaultValues, submitLabel, onSubmit, onCancel}: BudgetFormProps){
+	
 	return(
-		"test"
+		<form onSubmit={handleSubmit(submit)} noValidate>
+
+		</form>
 	)
 }

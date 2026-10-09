@@ -18,3 +18,10 @@ export type BudgetBalanceProps={
 	status: BudgetStatus
 	remainingCents: number
 }
+
+export interface BudgetFormProps{
+	defaultValues?: Partial<BudgetFormInput>
+	submitLabel: string
+	onSubmit: (values: BudgetFormValues) => Promise<void>
+	onCancel: () => void
+}

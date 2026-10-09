@@ -14,6 +14,7 @@ export function BudgetsListPage() {
 	const { categories } = useCategories()
 	const [operations, setOperations] = useState<Operation[]>([])
 	const [loading, setLoading] = useState(true)
+
 	const mock = categories.slice(0, 2).map((c, i) => ({ id: `b${i}`, categoryId: c.id, month: "2026-10", capCents: 10000 }))
 
 	const [monthFilter, setMonthFilter] = useState<string>("");
@@ -67,6 +68,7 @@ export function BudgetsListPage() {
 			{loading ? (
         		<p className="mt-6 text-muted-foreground">Chargement…</p>
       			) : (
+					// Alerte à refacto
 			<Link
 				to="/budgets"
 				className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 mt-4"
