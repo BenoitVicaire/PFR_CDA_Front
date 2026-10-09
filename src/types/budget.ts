@@ -15,6 +15,6 @@ export type BudgetElementProps={
 	spentCents: number
 }
 export type BudgetBalanceProps={
-	current: number
-	max: number
+	status: BudgetStatus
+	remainingCents: number
 }

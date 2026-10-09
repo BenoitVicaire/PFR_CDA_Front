@@ -25,6 +25,7 @@ import { LegalNoticePage } from "@/pages/LegalNoticePage"
 import { NotFoundPage } from "@/pages/NotFoundPage"
 import { PrivacyPolicyPage } from "@/pages/PrivacyPolicyPage"
 import { BudgetForm } from "./features/budgets/BudgetForm"
+import { EditBudgetPage } from "./features/budgets/pages/EditBudgetPage"
 
 export const router = createBrowserRouter([
   {
@@ -62,9 +63,11 @@ export const router = createBrowserRouter([
               { path: "/categories/nouvelle", element: <NewCategoryPage /> },
               { path: "/budgets", element: <BudgetsListPage /> },
               { path: "/budgets/new", element: <BudgetForm /> },
+              { path: "/budget/:id/edit", element: <EditBudgetPage /> },
               { path: "/statistiques", element: <StatisticsPage /> },
               { path: "/profil", element: <ProfilePage /> },
               { path: "/parametres", element: <SettingsPage /> },
+			  
             ],
           },
         ],
