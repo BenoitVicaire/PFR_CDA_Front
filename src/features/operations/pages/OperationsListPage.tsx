@@ -89,6 +89,8 @@ export function OperationsListPage() {
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-bold text-primary text-center">Opérations</h1>
 
+			{/* Option de tri et de recherche */}
+		{/* Types */}
       <div className="mt-6 flex flex-wrap items-end gap-3">
         <Select value={typeFilter} onValueChange={(value) => updateTypeFilter(value as typeof typeFilter)}>
           <SelectTrigger><SelectValue /></SelectTrigger>
@@ -99,6 +101,7 @@ export function OperationsListPage() {
           </SelectContent>
         </Select>
 
+		{/* Catégories */}
         <Select value={categoryFilter} onValueChange={updateCategoryFilter}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -111,8 +114,10 @@ export function OperationsListPage() {
           </SelectContent>
         </Select>
 
+		{/* Mois */}
         <MonthPicker value={monthFilter} onChange={updateMonthFilter} />
 
+		{/* Date */}
         <Select value={sort} onValueChange={(value) => setSort(value as SortOption)}>
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
@@ -123,6 +128,7 @@ export function OperationsListPage() {
           </SelectContent>
         </Select>
 
+		{/* Bouton ajouter */}
         <Button asChild className="ml-auto">
           <Link to="/operations/new">Ajouter</Link>
         </Button>
