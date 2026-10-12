@@ -1,3 +1,4 @@
+import type { BudgetFormInput, BudgetFormValues } from "@/features/budgets/schemas"
 import type { Category } from "./category"
 
 export interface Budget {

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { BudgetForm } from "../BudgetForm";
 import { useAuth } from "@/hooks/useAuth";
 import { firebaseBudgetService } from "@/services/firebase/budget.service";
+import type { BudgetFormValues } from "../schemas";
 
 
 export function NewBudget() {
@@ -12,13 +13,11 @@ export function NewBudget() {
 	async function handleSubmit(values: BudgetFormValues) {
 		if (!user) return
 		await firebaseBudgetService.create(user.id, {
-		  type: values.type,
-		  amountCents: Math.round(values.amount * 100),
-		  date: values.date,
 		  categoryId: values.categoryId,
-		  label: values.label || null,
+		  month: values.month,
+		  capCents: Math.round(values.amount * 100),
 		})
-		navigate("/operations")
+		navigate("/budgets")
 	  }
 
 	return (

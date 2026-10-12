@@ -8,16 +8,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { firebaseOperationService } from "@/services/firebase/operation.service";
 import type { Operation } from "@/types/operation";
 import { getSpentCents } from "../budget-utils";
+import type { Budget } from "@/types/budget";
+import { firebaseBudgetService } from "@/services/firebase/budget.service";
 
 export function BudgetsListPage() {
 	const { user } = useAuth()
-	const { categories } = useCategories()
 	const [operations, setOperations] = useState<Operation[]>([])
 	const [loading, setLoading] = useState(true)
+	const [budgets, setBudgets] = useState<Budget[]>([])
+	const currentMonth = new Date().toISOString().slice(0, 7); // "2026-10"
 
-	const mock = categories.slice(0, 2).map((c, i) => ({ id: `b${i}`, categoryId: c.id, month: "2026-10", capCents: 10000 }))
-
-	const [monthFilter, setMonthFilter] = useState<string>("");
+	const [monthFilter, setMonthFilter] = useState<string>(currentMonth);
 	const { categoryById } = useCategories();
 
 	function updateMonthFilter(value: string) {
@@ -30,11 +31,16 @@ export function BudgetsListPage() {
 
 	useEffect(() => {
 		if (!user) return
-		firebaseOperationService.list(user.id).then((result) => {
-		  setOperations(result)
+		Promise.all([
+			firebaseOperationService.list(user.id),
+			firebaseBudgetService.list(user.id, monthFilter),
+		])
+		.then(([operation,budget]) => {
+		  setOperations(operation)
+		  setBudgets(budget)
 		  setLoading(false)
 		})
-	  }, [user])
+	  }, [user,monthFilter])
 
 	return (
 		<section className="mx-auto w-full max-w-3xl px-4 py-12">
@@ -86,7 +92,7 @@ export function BudgetsListPage() {
 			)}
 			{/* Composant BudgetElement : Rendu des card de chaque budget */}
 			<section className="space-y-4 mt-4">
-				{mock.map((b) => (
+				{budgets.map((b) => (
 					<BudgetElement 
 					key={b.id} 
 					budget={b} 

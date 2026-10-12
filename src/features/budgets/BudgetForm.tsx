@@ -2,26 +2,35 @@ import { Button } from "@/components/ui/button";
 import {
 	Field,
 	FieldDescription,
+	FieldError,
 	FieldGroup,
 	FieldLabel,
-	FieldLegend,
-	FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
 	Select,
 	SelectContent,
-	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/hooks/useAuth";
-import { firebaseCategoryService } from "@/services/firebase/category.service";
+import { useCategories } from "@/hooks/useCategories";
+
 import type { BudgetFormProps } from "@/types/budget";
-import type { Category } from "@/types/category";
-import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import {
+	budgetSchema,
+	type BudgetFormInput,
+	type BudgetFormValues,
+} from "./schemas";
+import { useState } from "react";
+import { MonthPicker } from "@/components/MonthPicker";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+	InputGroupText,
+} from "@/components/ui/input-group";
 
 export function BudgetForm({
 	defaultValues,
@@ -29,87 +38,122 @@ export function BudgetForm({
 	onSubmit,
 	onCancel,
 }: BudgetFormProps) {
-	const { user } = useAuth();
-	const [categories, setCategories] = useState<Category[]>([]);
-
+	const { categories } = useCategories();
+	const [formError, setFormError] = useState<string | null>(null);
 	const currentMonth = new Date().toISOString().slice(0, 7); // "2026-10"
-	const { register, control, handleSubmit } = useForm({
-		defaultValues: { categoryId: "", month: currentMonth, amount: "" },
-		// resolver : zodResolver(budgetSchema)
+	const {
+		register,
+		control,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+	} = useForm<BudgetFormInput, unknown, BudgetFormValues>({
+		defaultValues: {
+			categoryId: "",
+			month: currentMonth,
+			amount: "",
+			...defaultValues,
+		},
+		resolver: zodResolver(budgetSchema),
 	});
 
-	function submit(values) {
-		console.log(values);
+	async function submit(values: BudgetFormValues) {
+		setFormError(null);
+		try {
+			await onSubmit(values);
+		} catch {
+			setFormError("Une erreur est survenue, réessaie.");
+		}
 	}
-
-	useEffect(() => {
-		if (!user) return;
-		firebaseCategoryService.list(user.id).then(setCategories);
-	}, [user]);
-
+	console.table(categories)
 	return (
 		<form onSubmit={handleSubmit(submit)} noValidate>
-			<FieldSet>
-				<FieldGroup>
-					{/* Menu select pour la catégorie a laquelle assigner un budget  */}
-					<Field>
-						<FieldLabel
-							htmlFor="categoryId"
-							className="text-primary"
-						>
-							Catégorie
-						</FieldLabel>
-						<Controller
-							control={control}
-							name="categoryId"
-							render={({ field }) => (
-								<Select
-									value={field.value}
-									onValueChange={field.onChange}
+			<FieldGroup>
+				{/* Menu select pour la catégorie a laquelle assigner un budget  */}
+				<Field data-invalid={!!errors.categoryId}>
+					<FieldLabel htmlFor="categoryId" className="text-primary">
+						Catégorie
+					</FieldLabel>
+					<Controller
+						control={control}
+						name="categoryId"
+						render={({ field }) => (
+							<Select
+								value={field.value}
+								onValueChange={field.onChange}
+							>
+								<SelectTrigger
+									id="categoryId"
+									className="w-full"
+									aria-invalid={!!errors.categoryId}
 								>
-									<SelectTrigger
-										id="categoryId"
-										className="w-full"
-									>
-										<SelectValue placeholder="Sélectionner" />
-									</SelectTrigger>
-									<SelectContent>
-										{categories.map((c) => (
+									<SelectValue placeholder="Sélectionner" />
+								</SelectTrigger>
+								<SelectContent>
+									{categories
+										.filter((c) => c.type === "expense")
+										.map((c) => (
 											<SelectItem key={c.id} value={c.id}>
 												{c.name}
 											</SelectItem>
 										))}
-									</SelectContent>
-								</Select>
-							)}
-						/>
-						<FieldDescription>
-							A quel catégories voullez vous assigner ce budget?
-						</FieldDescription>
-					</Field>
-					{/* Montant du budget */}
-					<Field>
-						<FieldLabel htmlFor="amount" className="text-primary">
-							Montant
-						</FieldLabel>
-						<Input
+								</SelectContent>
+							</Select>
+						)}
+					/>
+					<FieldError errors={[errors.categoryId]} />
+					<FieldDescription>
+						À quelle catégorie voulez-vous assigner ce budget ?
+					</FieldDescription>
+				</Field>
+				{/* Mois auquel appliqué le budget */}
+				<Field data-invalid={!!errors.month}>
+					<FieldLabel htmlFor="month" className="text-primary">
+						Mois
+					</FieldLabel>
+					<Controller
+						control={control}
+						name="month"
+						render={({ field }) => (
+							<MonthPicker
+								value={field.value}
+								onChange={field.onChange}
+							/>
+						)}
+					/>
+					<FieldError errors={[errors.month]} />
+				</Field>
+				{/* Montant du budget */}
+				<Field data-invalid={!!errors.amount}>
+					<FieldLabel htmlFor="amount" className="text-primary">
+						Montant
+					</FieldLabel>
+					<InputGroup>
+						<InputGroupInput
 							id="amount"
 							type="number"
 							step="0.01"
+							aria-invalid={!!errors.amount}
 							{...register("amount")}
 						/>
-						<FieldDescription>
-							Le montant en € du budget
-						</FieldDescription>
-					</Field>
-					<Field orientation="horizontal">
-						<Button type="submit">Submit</Button>
-						<Button variant="outline" type="button">
-						Cancel
-						</Button>
-					</Field>
-				</FieldGroup>
-			</FieldSet>
+						<InputGroupAddon align="inline-end">
+							<InputGroupText>€</InputGroupText>
+						</InputGroupAddon>
+					</InputGroup>
+					<FieldError errors={[errors.amount]} />
+					<FieldDescription>
+						Le montant en € du budget
+					</FieldDescription>
+				</Field>
+				{formError ? <FieldError>{formError}</FieldError> : null}
+				<Field orientation="horizontal">
+					<Button type="submit" disabled={isSubmitting}>
+						{isSubmitting ? "Enregistrement..." : submitLabel}
+					</Button>
+					<Button variant="outline" type="button" onClick={onCancel}>
+						Annuler
+					</Button>
+				</Field>
+			</FieldGroup>
 		</form>
 	);
 }
