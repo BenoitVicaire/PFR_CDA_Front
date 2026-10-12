@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { BudgetForm } from "../BudgetForm";
 import { useAuth } from "@/hooks/useAuth";
+import { firebaseBudgetService } from "@/services/firebase/budget.service";
 
 
 export function NewBudget() {
@@ -25,7 +26,7 @@ export function NewBudget() {
 			<div className="rounded-2xl border border-border bg-card p-6">
 				<div className="mb-5 flex items-center justify-between">
 					<h1 className="text-xl font-semibold text-primary">
-						Nouvelle opération
+						Nouveau budget
 					</h1>
 					<Link
 						to="/operations"
