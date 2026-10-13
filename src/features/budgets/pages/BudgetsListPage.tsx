@@ -10,6 +10,7 @@ import type { Operation } from "@/types/operation";
 import { getSpentCents } from "../budget-utils";
 import type { Budget } from "@/types/budget";
 import { firebaseBudgetService } from "@/services/firebase/budget.service";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function BudgetsListPage() {
 	const { user } = useAuth()
@@ -25,12 +26,9 @@ export function BudgetsListPage() {
 		setMonthFilter(value);
 	}
 
-	function handleCarryOver() {
-		// Recupere tout les budget pour le mois courrant
-		console.log(budgets);
-		
-		// Recréer les budget pour le mois a venir si le budget n'existe pas déja.
-	}
+	// function handleCarryOver() {
+	// 	console.log("Work in progress");
+	// }
 
 	useEffect(() => {
 		if (!user) return
@@ -48,25 +46,33 @@ export function BudgetsListPage() {
 	return (
 		<section className="mx-auto w-full max-w-3xl px-4 py-12">
 			{/* En tête */}
-			<div >
+			<div>
 				<h1 className="text-3xl font-bold text-primary text-center">
 					Budget
 				</h1>
-				
+
 				{/* Option de la table et boutons */}
 				<div className="flex items-center gap-3 mt-6">
 					<MonthPicker
 						value={monthFilter}
 						onChange={updateMonthFilter}
 					/>
-
-					<Button
-						variant="outline"
-						onClick={handleCarryOver}
-						className="ml-auto"
-					>
-						Reconduire le mois précedent
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span tabIndex={0} className="ml-auto inline-block">
+								<Button
+									variant="outline"
+									// onClick={handleCarryOver} 
+									disabled
+								>
+									Reconduire le mois précédent
+								</Button>
+							</span>
+						</TooltipTrigger>
+						<TooltipContent>
+							Bientôt disponible
+						</TooltipContent>
+					</Tooltip>
 
 					<Button asChild>
 						<Link to="/budgets/new">+ Ajouter un budget</Link>
@@ -75,32 +81,32 @@ export function BudgetsListPage() {
 			</div>
 
 			{loading ? (
-        		<p className="mt-6 text-muted-foreground">Chargement…</p>
-      			) : (
-					// Alerte à refacto
-			<Link
-				to="/budgets"
-				className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 mt-4"
-			>
-				<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-white">
-					!
-				</span>
-				<p className="flex-1 text-sm font-medium text-primary">
-					2 catégories en dépassement
-				</p>
-				<span className="shrink-0 text-xs font-semibold text-warning">
-					Voir →
-				</span>
-			</Link>
+				<p className="mt-6 text-muted-foreground">Chargement…</p>
+			) : (
+				// Alerte à refacto
+				<Link
+					to="/budgets"
+					className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 mt-4"
+				>
+					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-white">
+						!
+					</span>
+					<p className="flex-1 text-sm font-medium text-primary">
+						2 catégories en dépassement
+					</p>
+					<span className="shrink-0 text-xs font-semibold text-warning">
+						Voir →
+					</span>
+				</Link>
 			)}
 			{/* Composant BudgetElement : Rendu des card de chaque budget */}
 			<section className="space-y-4 mt-4">
 				{budgets.map((b) => (
-					<BudgetElement 
-					key={b.id} 
-					budget={b} 
-					category={categoryById.get(b.categoryId)}
-					spentCents={getSpentCents(b,operations)} 
+					<BudgetElement
+						key={b.id}
+						budget={b}
+						category={categoryById.get(b.categoryId)}
+						spentCents={getSpentCents(b, operations)}
 					/>
 				))}
 			</section>
