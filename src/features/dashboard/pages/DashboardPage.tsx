@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { firebaseOperationService } from "@/services/firebase/operation.service"
 import { totalTypeForMonth } from "@/lib/utils"
 import { Spinner } from "@/components/ui/spinner"
+import { OverBudgetAlert } from "@/features/budgets/OverBudgetAlert"
 
 const CURRENCY = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" })
 
@@ -144,6 +145,7 @@ export function DashboardPage() {
       </section>
 	  )}
 
+	  {/* Bandereau d'alerte */}
       <Link
         to="/budgets"
         className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3"
@@ -154,6 +156,10 @@ export function DashboardPage() {
         <p className="flex-1 text-sm font-medium text-primary">2 catégories en dépassement</p>
         <span className="shrink-0 text-xs font-semibold text-warning">Voir →</span>
       </Link>
+	  {/* Test */}
+	  <OverBudgetAlert>
+		
+	  </OverBudgetAlert>
 
       <section className="rounded-xl border border-border bg-card p-4">
         <div className="flex items-center justify-between">

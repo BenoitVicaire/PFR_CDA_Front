@@ -27,3 +27,7 @@ export interface BudgetFormProps{
 	onSubmit: (values: BudgetFormValues) => Promise<void>
 	onCancel: () => void
 }
+
+export interface OverBudgetAlertProps{
+	budgets: Budget
+}
