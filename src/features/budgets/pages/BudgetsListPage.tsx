@@ -26,7 +26,10 @@ export function BudgetsListPage() {
 	}
 
 	function handleCarryOver() {
-		console.log("test");
+		// Recupere tout les budget pour le mois courrant
+		console.log(budgets);
+		
+		// Recréer les budget pour le mois a venir si le budget n'existe pas déja.
 	}
 
 	useEffect(() => {

@@ -37,6 +37,7 @@ export function BudgetForm({
 	submitLabel,
 	onSubmit,
 	onCancel,
+	editMode,
 }: BudgetFormProps) {
 	const { categories } = useCategories();
 	const [formError, setFormError] = useState<string | null>(null);
@@ -64,7 +65,7 @@ export function BudgetForm({
 			setFormError("Une erreur est survenue, réessaie.");
 		}
 	}
-	console.table(categories)
+
 	return (
 		<form onSubmit={handleSubmit(submit)} noValidate>
 			<FieldGroup>
@@ -80,6 +81,7 @@ export function BudgetForm({
 							<Select
 								value={field.value}
 								onValueChange={field.onChange}
+								disabled={editMode}
 							>
 								<SelectTrigger
 									id="categoryId"
@@ -117,6 +119,7 @@ export function BudgetForm({
 							<MonthPicker
 								value={field.value}
 								onChange={field.onChange}
+								disabled={editMode}
 							/>
 						)}
 					/>

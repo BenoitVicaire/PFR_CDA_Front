@@ -23,6 +23,7 @@ export type BudgetBalanceProps={
 export interface BudgetFormProps{
 	defaultValues?: Partial<BudgetFormInput>
 	submitLabel: string
+	editMode?: boolean
 	onSubmit: (values: BudgetFormValues) => Promise<void>
 	onCancel: () => void
 }

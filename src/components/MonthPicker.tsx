@@ -25,9 +25,10 @@ interface MonthPickerProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  disabled?: boolean
 }
 
-export function MonthPicker({ value, onChange, placeholder = "Tous les mois" }: MonthPickerProps) {
+export function MonthPicker({ value, onChange, placeholder = "Tous les mois", disabled = false }: MonthPickerProps) {
   const [open, setOpen] = useState(false)
   const [year, setYear] = useState(() => (value ? Number(value.slice(0, 4)) : new Date().getFullYear()))
 
@@ -46,6 +47,7 @@ export function MonthPicker({ value, onChange, placeholder = "Tous les mois" }: 
         <Button
           type="button"
           variant="outline"
+		  disabled={disabled}
           className={cn("justify-start font-normal", !value && "text-muted-foreground")}
         >
           <Calendar />

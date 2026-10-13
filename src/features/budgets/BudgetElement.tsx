@@ -80,7 +80,7 @@ export function BudgetElement({ budget, category, spentCents }:  BudgetElementPr
 							/>
 					{/* Bouton Modifier */}
 						<Button asChild variant={"outline"} size="sm" className="bg-card text-primary">
-							<Link to={`/budgets/${budget.id}/edit`}>
+							<Link to={`/budget/${budget.id}/edit`}>
 							<SquarePen /> Modifier
 							</Link>
 						</Button>

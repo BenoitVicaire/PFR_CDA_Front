@@ -92,8 +92,7 @@ export function OperationDetailPage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Supprimer cette opération ?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Cette action est réversible pendant 30 jours, puis l'opération sera définitivement
-                    supprimée.
+                    L’opération sera supprimée de votre liste et de vos calculs.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
