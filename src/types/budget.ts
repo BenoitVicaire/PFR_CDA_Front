@@ -1,5 +1,6 @@
 import type { BudgetFormInput, BudgetFormValues } from "@/features/budgets/schemas"
 import type { Category } from "./category"
+import type { Operation } from "./operation"
 
 export interface Budget {
   id: string
@@ -29,5 +30,7 @@ export interface BudgetFormProps{
 }
 
 export interface OverBudgetAlertProps{
-	budgets: Budget
+	over : Budget[]
+	warning : Budget[]
+	operations: Operation[]
 }

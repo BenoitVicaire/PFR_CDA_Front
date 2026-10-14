@@ -17,3 +17,15 @@ export function getStatus(current:number,max:number): BudgetStatus{
 	if(ratio >= 0.8) return "warning"
 	return "ok"
 }
+
+export function groupBudgetsByAlert(budgets:Budget[],operations:Operation[]){
+	const over : Budget[] = []
+	const warning : Budget[] = []
+
+	for (const b of budgets) {
+		const status = getStatus(getSpentCents(b,operations), b.capCents)
+		if (status === "over") over.push(b)
+		else if (status === "warning") warning.push(b)
+	}
+	return { over, warning}
+}

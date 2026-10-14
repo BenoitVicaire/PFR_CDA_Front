@@ -1,6 +1,5 @@
 import { ChevronDown, Menu } from "lucide-react"
 import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from "recharts"
-import { Link } from "react-router-dom"
 
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
@@ -11,6 +10,8 @@ import { firebaseOperationService } from "@/services/firebase/operation.service"
 import { totalTypeForMonth } from "@/lib/utils"
 import { Spinner } from "@/components/ui/spinner"
 import { OverBudgetAlert } from "@/features/budgets/OverBudgetAlert"
+import type { Budget } from "@/types/budget"
+import { getOverBudget } from "@/features/budgets/budget-alerts"
 
 const CURRENCY = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" })
 
@@ -57,6 +58,7 @@ function budgetStatusClasses(percent: number) {
   return { text: "text-success", bar: "bg-success" }
 }
 
+
 // Gère le comportement du bloc d'en tête balance / depense /revenu
 function BalanceBlock({currentBalance,previousBalance,currentMonth,previousMonth}:{currentBalance:number,previousBalance:number,currentMonth:Date,previousMonth:Date}){
 	const monthYearString= currentMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" })
@@ -88,6 +90,7 @@ export function DashboardPage() {
 	const [loading, setLoading] = useState(true)
 
 	const [operations,setOperations] = useState<Operation[]>([])
+	const [alerts, setAlerts] = useState<{over: Budget[]; warning: Budget[]}>()
 
 	const currentDate = new Date()
 	const currentMonth = `${currentDate.getFullYear()}-${(String(currentDate.getMonth()+1)).padStart(2, "0")}`
@@ -113,6 +116,12 @@ export function DashboardPage() {
 			})
 	},[user])
 
+	useEffect(()=>{
+		if(!user) return
+		getOverBudget(user.id, currentMonth).then(setAlerts)
+	}, [user, currentMonth])
+
+	
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-3">
       <div className="flex items-center justify-between py-2 md:hidden">
@@ -146,20 +155,13 @@ export function DashboardPage() {
 	  )}
 
 	  {/* Bandereau d'alerte */}
-      <Link
-        to="/budgets"
-        className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3"
-      >
-        <span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-white">
-          !
-        </span>
-        <p className="flex-1 text-sm font-medium text-primary">2 catégories en dépassement</p>
-        <span className="shrink-0 text-xs font-semibold text-warning">Voir →</span>
-      </Link>
-	  {/* Test */}
-	  <OverBudgetAlert>
+	  { alerts && <OverBudgetAlert
+	  	over = {alerts.over}
+		warning = { alerts.warning}
+		operations={ operations }
+	  />}
 		
-	  </OverBudgetAlert>
+	  
 
       <section className="rounded-xl border border-border bg-card p-4">
         <div className="flex items-center justify-between">
