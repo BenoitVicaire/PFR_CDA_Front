@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc, query, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import type { BudgetService } from "../budget-service"
 import type { Budget } from "@/types/budget"
@@ -8,8 +8,11 @@ function budgetsRef(userId: string){
 }
 
 export const firebaseBudgetService: BudgetService = {
-	async list(userId){
-		const snapshot = await getDocs(budgetsRef(userId))
+	async list(userId, month){
+		const ref = month	
+			? query(budgetsRef(userId), where("month", "==", month))
+			: budgetsRef(userId)
+		const snapshot = await getDocs(ref)
 		return snapshot.docs.map((document) => ({id: document.id, ... document.data()}) as Budget)
 	},
 

@@ -18,6 +18,7 @@ export function BudgetsListPage() {
 	const [loading, setLoading] = useState(true)
 	const [budgets, setBudgets] = useState<Budget[]>([])
 	const currentMonth = new Date().toISOString().slice(0, 7); // "2026-10"
+	const [error, setError] = useState<string | null>(null)
 
 	const [monthFilter, setMonthFilter] = useState<string>(currentMonth);
 	const { categoryById } = useCategories();
@@ -39,8 +40,9 @@ export function BudgetsListPage() {
 		.then(([operation,budget]) => {
 		  setOperations(operation)
 		  setBudgets(budget)
-		  setLoading(false)
-		})
+		  setError(null)
+		}).catch(()=> setError("Impossible de charger les budgets"))
+		.finally(()=> setLoading(false))
 	  }, [user,monthFilter])
 
 	return (
@@ -82,6 +84,8 @@ export function BudgetsListPage() {
 
 			{loading ? (
 				<p className="mt-6 text-muted-foreground">Chargement…</p>
+			) : error ? (
+				<p role="alert" className="mt-6 text-destructive">{error}</p>
 			) : (
 				// Alerte à refacto
 				<Link

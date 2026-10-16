@@ -48,8 +48,11 @@ export function BudgetElement({ budget, category, spentCents }:  BudgetElementPr
 				<CardTitle className="flex items-center gap-3 text-primary">
 					{/* Icon */}
 					<span
-						className="flex size-8 shrink-0 items-center justify-center rounded-full text-white"
-						style={{ backgroundColor: `var(--${category?.color})` }}
+						className={cn(
+								"flex size-8 shrink-0 items-center justify-center rounded-full",
+								category ? "text-white" : "bg-muted text-muted-foreground",
+							)}
+						style={category ? { backgroundColor: `var(--${category.color})` } : undefined}
 					>
 						{CategoryIcon ? <CategoryIcon className="size-4"/> : null}
 					</span>
@@ -80,7 +83,7 @@ export function BudgetElement({ budget, category, spentCents }:  BudgetElementPr
 							/>
 					{/* Bouton Modifier */}
 						<Button asChild variant={"outline"} size="sm" className="bg-card text-primary">
-							<Link to={`/budget/${budget.id}/edit`}>
+							<Link to={`/budgets/${budget.id}/edit`}>
 							<SquarePen /> Modifier
 							</Link>
 						</Button>

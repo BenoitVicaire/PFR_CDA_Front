@@ -1,75 +1,62 @@
-# React + TypeScript + Vite
+# Budget Perso
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application web de **gestion de budget personnel** : suivre ses revenus et ses dépenses, les ranger par catégories, fixer des budgets mensuels et être alerté en cas de dépassement.
 
-Currently, two official plugins are available:
+Projet fil rouge de la formation CDA (Concepteur Développeur d'Applications) ce dépôt contient le **frontend**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Fonctionnalités
 
-## React Compiler
+- **Dashboard** : balance du mois (revenus, dépenses, évolution par rapport au mois précédent) et alertes de dépassement de budget.
+- **Opérations** : ajout, modification et suppression des revenus et dépenses, avec filtres (type, catégorie, mois), tri et pagination.
+- **Budgets** : un plafond mensuel par catégorie de dépenses, une jauge de consommation (vert, orange, rouge selon le pourcentage utilisé) et une alerte listant les budgets dépassés ou à surveiller.
+- **Catégories** : catégories de dépenses et de revenus créées par défaut à l'inscription (la création de catégories personnalisées est à venir).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack technique
 
-## Expanding the ESLint configuration
+| Rôle | Outil |
+|---|---|
+| Build et serveur de dev | [Vite](https://vite.dev/guide/) |
+| Interface | [React](https://react.dev/) |
+| Langage | [TypeScript](https://www.typescriptlang.org/docs/) |
+| Routage | [React Router](https://reactrouter.com/home) |
+| Composants | [shadcn/ui](https://ui.shadcn.com/docs) (basé sur [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction)) |
+| Styles | [Tailwind CSS](https://tailwindcss.com/docs) |
+| Icônes | [Lucide](https://lucide.dev/guide/packages/lucide-react) |
+| Formulaires | [React Hook Form](https://react-hook-form.com/get-started) |
+| Validation | [Zod](https://zod.dev/) |
+| Graphiques | [Recharts](https://recharts.org/en-US/guide) |
+| Données et authentification (phase 1) | [Firebase](https://firebase.google.com/docs) (Auth et Firestore) |
+| Gestionnaire de paquets | [pnpm](https://pnpm.io/motivation) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Copier `.env.example` en `.env.local` et renseigner les variables `VITE_FIREBASE_*` de votre projet Firebase.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+pnpm dev      # serveur de développement
+pnpm build    # vérification TypeScript et build de production
+pnpm lint     # analyse ESLint
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Organisation du code
 
 ```
+src/
+  components/    # composants réutilisables (components/ui = shadcn)
+  features/      # un dossier par domaine : operations, budgets, categories, dashboard, auth
+  services/      # accès aux données (interfaces) ; services/firebase = implémentation actuelle
+  types/         # types métier partagés
+  hooks/  lib/   # hooks et utilitaires
+```
+
+Les montants sont manipulés en **centimes** (entiers) pour éviter les erreurs d'arrondi, et formatés en euros à l'affichage.
+
+## De Firebase à Laravel
+
+Le backend actuel est **Firebase**. Il sera remplacé par une **[API Laravel](https://laravel.com/docs)** dans une seconde phase.
+
+Pour que ce passage ne touche qu'une seule couche, les composants n'importent jamais le SDK Firebase : tout accès aux données passe par les interfaces de `src/services/`. Migrer vers Laravel revient à écrire de nouvelles implémentations de ces services, sans réécrire les écrans.

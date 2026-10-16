@@ -63,7 +63,7 @@ export const router = createBrowserRouter([
               { path: "/categories/nouvelle", element: <NewCategoryPage /> },
               { path: "/budgets", element: <BudgetsListPage /> },
               { path: "/budgets/new", element: <NewBudget /> },
-              { path: "/budget/:id/edit", element: <EditBudgetPage /> },
+              { path: "/budgets/:id/edit", element: <EditBudgetPage /> },
               { path: "/statistiques", element: <StatisticsPage /> },
               { path: "/profil", element: <ProfilePage /> },
               { path: "/parametres", element: <SettingsPage /> },

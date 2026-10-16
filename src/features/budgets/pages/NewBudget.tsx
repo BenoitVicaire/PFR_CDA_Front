@@ -28,7 +28,7 @@ export function NewBudget() {
 						Nouveau budget
 					</h1>
 					<Link
-						to="/operations"
+						to="/budgets"
 						aria-label="Fermer"
 						className="text-muted-foreground hover:text-primary"
 					>
@@ -38,7 +38,7 @@ export function NewBudget() {
 				<BudgetForm
 					submitLabel="Valider"
 					onSubmit={handleSubmit}
-					onCancel={() => navigate("/operations")}
+					onCancel={() => navigate("/budgets")}
 				/>
 			</div>
 		</div>
