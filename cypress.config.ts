@@ -10,5 +10,13 @@ export default defineConfig({
     video: false,
     screenshotOnRunFailure: true,
     retries: { runMode: 1, openMode: 0 },
+    setupNodeEvents(on) {
+      on("task", {
+        table(rows: unknown[]) {
+          console.table(rows)
+          return null
+        },
+      })
+    },
   },
 })
