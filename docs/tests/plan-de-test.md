@@ -151,8 +151,11 @@ Préconditions communes : utilisateur connecté, page `/operations` affichée av
 | CT-A11Y-04 | ENF-U04 | N | Analyser le formulaire de saisie (hors contraste) | Aucune violation | `accessibility.cy.ts` |
 | CT-A11Y-05 | ENF-U04 | N | Analyser la modale de suppression ouverte (hors contraste) | Aucune violation | `accessibility.cy.ts` |
 | CT-A11Y-06 | ENF-U04 | N | Parcourir le formulaire avec la touche Tab | Le focus passe du montant à la catégorie, puis du libellé à « Annuler » et « Valider » | `accessibility.cy.ts` |
-| CT-A11Y-07 | ENF-U04 | N | Contrôler le contraste de la page de connexion | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` (désactivé, écart connu) |
-| CT-A11Y-08 | ENF-U04 | N | Contrôler le contraste de la liste des opérations | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` (désactivé, écart connu) |
+| CT-A11Y-07 | ENF-U04 | N | Contrôler le contraste de la page de connexion | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-08 | ENF-U04 | N | Contrôler le contraste de la liste des opérations | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-09 | ENF-U04 | N | Contrôler le contraste du dashboard | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-10 | ENF-U04 | N | Contrôler le contraste du formulaire de saisie | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-11 | ENF-U04 | N | Contrôler le contraste de la modale de suppression | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 
 ## 6. Critères d'entrée et de sortie
 
@@ -181,13 +184,13 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 | US-006 | Le scénario Gherkin prévoit que le bouton « Valider » soit désactivé quand le montant est invalide. L'application laisse le bouton actif et affiche l'erreur à la soumission. | Le test CT-OP-03 vérifie le comportement réel (message d'erreur, aucun enregistrement). Écart à arbitrer : adapter l'US ou le formulaire. |
 | US-006 | Le critère « le solde du dashboard est mis à jour » est vérifié sur le total des dépenses (CT-OP-17). | Suffisant pour cette version. |
 | EF-B02 | La suppression est logique (`deletedAt`). Le test vérifie la disparition de la ligne, pas le maintien de la donnée côté base. | À couvrir par un test d'API quand le backend Laravel existera. |
-| ENF-U04 | Le contrôle de contraste révèle des textes sous le ratio 4,5:1 exigé par WCAG AA. Cause identifiée : la couleur `--muted-foreground` (#9E9E9E, ratio 2,7:1 sur fond blanc), les textes en `warning` (#E68A00, ratio 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, ratio 4,3:1). | Les cas CT-A11Y-07 et CT-A11Y-08 sont écrits mais désactivés, et le contraste est exclu de CT-A11Y-01 à 05, pour ne pas bloquer le pipeline. Correction à prévoir sur les tokens du design système (P4-05), puis réactivation. |
+| ENF-U04 | Le contrôle de contraste a révélé des textes sous le ratio 4,5:1 exigé par WCAG AA : `--muted-foreground` (#9E9E9E, 2,7:1 sur blanc), `--warning-500` (#E68A00, 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, 4,3:1). | Corrigé dans `src/index.css` : `--muted-foreground` #666666 (5,3:1 sur #F5F5F5), `--warning-500` #9A5700 (5,2:1) et `--destructive` #C62828 (5,2:1). Les tests de contraste CT-A11Y-07 à 11 valident la correction. Les tokens de la maquette P4-05 sont à mettre à jour en conséquence. |
 | ENF-U04 | Les barres de progression des budgets n'avaient pas de nom accessible. | Corrigé : `aria-label` ajouté sur le dashboard et sur les cartes de budget. |
 | Général | Les données sont en mémoire : aucun test ne valide la persistance réelle. | Voir section 9. |
 
 ## 9. Évolutions prévues
 
-1. Correction des contrastes et réactivation de CT-A11Y-07 et CT-A11Y-08, avec extension de l'analyse aux autres écrans.
+1. Extension de l'analyse d'accessibilité aux écrans hors fil rouge (catégories, budgets, statistiques, profil).
 2. Tests unitaires (Vitest) de la logique pure : calcul des seuils de budget (`getStatus`, `groupBudgetsByAlert`), conversion des montants en centimes, schémas Zod.
 3. Tests d'API (PHPUnit) sur le backend Laravel, puis quelques parcours E2E exécutés contre l'API réelle.
 4. Extension à l'inscription, aux catégories et aux budgets.
@@ -197,4 +200,4 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 | Campagne | Environnement | Résultat |
 |---|---|---|
 | Locale, 19/10/2026 | Windows, Electron (headless), `pnpm e2e` | 22 cas sur 22 passés, durée d'environ 1 minute |
-| Intégration continue | Ubuntu, Chrome et Firefox | À consigner après le premier run du workflow |
+| Intégration continue, PR n°1 | Ubuntu, Chrome et Firefox | 22 cas sur 22 passés sur les deux navigateurs |
