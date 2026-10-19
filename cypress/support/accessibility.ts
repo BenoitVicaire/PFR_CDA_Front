@@ -21,10 +21,15 @@ interface WcagOptions {
 
 /**
  * Analyse la page courante avec axe-core selon les critères WCAG 2.1 niveau A et AA.
+ * L'analyse démarre une fois les animations terminées, car axe mesure les contrastes sur les couleurs
+ * affichées à l'instant T (une modale en fondu fausserait le résultat).
  * Le test échoue dès qu'une règle est violée et le détail est affiché dans la console du terminal.
  * @param options Permet de désactiver la règle de contraste, traitée dans un test séparé.
  */
 export function expectNoWcagViolations({ contrast = true }: WcagOptions = {}) {
+  cy.document().should((document) => {
+    expect(document.getAnimations()).to.have.length(0)
+  })
   cy.injectAxe()
   cy.checkA11y(
     undefined,
