@@ -156,6 +156,8 @@ Préconditions communes : utilisateur connecté, page `/operations` affichée av
 | CT-A11Y-09 | ENF-U04 | N | Contrôler le contraste du dashboard | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 | CT-A11Y-10 | ENF-U04 | N | Contrôler le contraste du formulaire de saisie | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 | CT-A11Y-11 | ENF-U04 | N | Contrôler le contraste de la modale de suppression | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-12 | ENF-U04 | L | Contrôler le contraste du dashboard avec un budget à 85 % (alerte « à surveiller ») | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-13 | ENF-U04 | L | Contrôler le contraste de la liste des budgets avec un budget à 85 % | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 
 ## 6. Critères d'entrée et de sortie
 
@@ -184,7 +186,8 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 | US-006 | Le scénario Gherkin prévoit que le bouton « Valider » soit désactivé quand le montant est invalide. L'application laisse le bouton actif et affiche l'erreur à la soumission. | Le test CT-OP-03 vérifie le comportement réel (message d'erreur, aucun enregistrement). Écart à arbitrer : adapter l'US ou le formulaire. |
 | US-006 | Le critère « le solde du dashboard est mis à jour » est vérifié sur le total des dépenses (CT-OP-17). | Suffisant pour cette version. |
 | EF-B02 | La suppression est logique (`deletedAt`). Le test vérifie la disparition de la ligne, pas le maintien de la donnée côté base. | À couvrir par un test d'API quand le backend Laravel existera. |
-| ENF-U04 | Le contrôle de contraste a révélé des textes sous le ratio 4,5:1 exigé par WCAG AA : `--muted-foreground` (#9E9E9E, 2,7:1 sur blanc), `--warning-500` (#E68A00, 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, 4,3:1). | Corrigé dans `src/index.css` : `--muted-foreground` #666666 (5,3:1 sur #F5F5F5), `--warning-500` #9A5700 (5,2:1) et `--destructive` #C62828 (5,2:1). Les tests de contraste CT-A11Y-07 à 11 valident la correction. Les tokens de la maquette P4-05 sont à mettre à jour en conséquence. |
+| ENF-U04 | Le contrôle de contraste a révélé des textes sous le ratio 4,5:1 exigé par WCAG AA : `--muted-foreground` (#9E9E9E, 2,7:1 sur blanc), le orange d'avertissement utilisé comme couleur de texte (#E68A00, 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, 4,3:1). | Corrigé dans `src/index.css` : `--muted-foreground` #666666 (5,3:1 sur #F5F5F5) et `--destructive` #C62828 (5,2:1). Pour le orange, deux tokens distincts : `--warning-500` #E68A00 conservé pour les fonds, barres et bordures, `--warning-700` #9A5700 pour le texte sur fond clair (5,1:1 sur #FFF3E0) et `--warning-foreground` #3B2300 pour le texte posé sur un fond orange (5,6:1). Les tokens de la maquette P4-05 sont à mettre à jour en conséquence. |
+| ENF-U04 | Une première correction avait assombri le orange pour tous ses usages : les badges et barres de budget devenaient bruns et leur texte illisible. Détecté à la relecture visuelle, pas par axe, qui ne juge que les ratios. | Séparation des tokens (voir ligne précédente) et ajout de CT-A11Y-12 et CT-A11Y-13 sur l'état « à surveiller ». Le contrôle visuel reste nécessaire en complément. |
 | ENF-U04 | Les barres de progression des budgets n'avaient pas de nom accessible. | Corrigé : `aria-label` ajouté sur le dashboard et sur les cartes de budget. |
 | Général | Les données sont en mémoire : aucun test ne valide la persistance réelle. | Voir section 9. |
 

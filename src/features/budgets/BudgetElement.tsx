@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const STATUS_UI = {
 		ok : {icon: Check, text: "text-success", background: "bg-success-100", bar:"bg-success"},
-		warning : {icon: TriangleAlert, text: "text-foreground", background:"bg-warning", bar:"bg-warning"},
+		warning : {icon: TriangleAlert, text: "text-warning-foreground", background:"bg-warning", bar:"bg-warning"},
 		over : {icon: CircleAlert, text: "text-destructive",background: "bg-destructive/10", bar:"bg-destructive"},
 	}
 

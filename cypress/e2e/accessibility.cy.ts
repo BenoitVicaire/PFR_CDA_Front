@@ -103,5 +103,29 @@ describe("Accessibilité WCAG 2.1 AA (ENF-U04)", () => {
 
       expectNoWcagViolations()
     })
+
+    it("CT-A11Y-12 : le dashboard respecte le ratio 4.5:1 avec un budget à surveiller", () => {
+      cy.login()
+      cy.navigateTo("Opérations")
+      cy.contains("a", "Ajouter").click()
+      cy.fillOperationForm({ type: "expense", amount: "85", category: "Alimentation", label: "Courses" })
+      cy.contains("button", "Valider").click()
+      cy.navigateTo("Dashboard")
+      cy.contains("1 catégorie à surveiller").should("be.visible")
+
+      expectNoWcagViolations()
+    })
+
+    it("CT-A11Y-13 : la liste des budgets respecte le ratio 4.5:1 avec un budget à surveiller", () => {
+      cy.login()
+      cy.navigateTo("Opérations")
+      cy.contains("a", "Ajouter").click()
+      cy.fillOperationForm({ type: "expense", amount: "85", category: "Alimentation", label: "Courses" })
+      cy.contains("button", "Valider").click()
+      cy.navigateTo("Budgets")
+      cy.contains("Budget presque atteint").should("be.visible")
+
+      expectNoWcagViolations()
+    })
   })
 })

@@ -31,7 +31,7 @@ export function OverBudgetAlert({
 					type="button"
 					className="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 text-left hover:bg-warning-100/70"
 				>
-					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-white">
+					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-warning-foreground">
 						!
 					</span>
 					<div className="flex flex-1 flex-col text-sm font-medium">
@@ -43,14 +43,14 @@ export function OverBudgetAlert({
 							</span>
 						)}
 						{warningCount > 0 && (
-							<span className="text-warning">
+							<span className="text-warning-700">
 								{warningCount}{" "}
 								{warningCount > 1 ? "catégories" : "catégorie"}{" "}
 								à surveiller
 							</span>
 						)}
 					</div>
-					<span className="shrink-0 text-xs font-semibold text-warning">
+					<span className="shrink-0 text-xs font-semibold text-warning-700">
 						Voir →
 					</span>
 				</button>
@@ -96,7 +96,7 @@ export function OverBudgetAlert({
 					</TableBody>
 				</Table>
 				{/* Table Warning */}
-				<h3 className="mt-4 text-lg font-semibold text-warning text-center"> A surveiller</h3>
+				<h3 className="mt-4 text-lg font-semibold text-warning-700 text-center"> A surveiller</h3>
 				<Table className="text-primary">
 					<TableHeader>
 						<TableRow>
@@ -121,7 +121,7 @@ export function OverBudgetAlert({
 								{/* Cap du budget */}
 								<TableCell className="text-right">{CURRENCY.format(w.capCents / 100)}</TableCell>
 								{/* % */}
-								<TableCell className="text-right text-warning font-semibold">{Math.round(getSpentCents(w, operations)/w.capCents *100)} %</TableCell>
+								<TableCell className="text-right text-warning-700 font-semibold">{Math.round(getSpentCents(w, operations)/w.capCents *100)} %</TableCell>
 							</TableRow>
 						))}
 						

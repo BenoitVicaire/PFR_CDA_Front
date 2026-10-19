@@ -17,6 +17,8 @@
     --color-success-100: var(--success-100);
     --color-warning: var(--warning-500);
     --color-warning-100: var(--warning-100);
+    --color-warning-700: var(--warning-700);
+    --color-warning-foreground: var(--warning-foreground);
     --color-danger-100: var(--danger-100);
     --color-danger-700: var(--danger-700);
     --color-info: var(--info);
@@ -106,7 +108,9 @@
     --radius: 0.625rem;
     --success-500: #2E7D32;
     --success-100: #E6F4EA;
-    --warning-500: #9A5700;
+    --warning-500: #E68A00;
+    --warning-700: #9A5700;
+    --warning-foreground: #3B2300;
     --warning-100: #FFF3E0;
     --danger-100: #FDECEC;
     --danger-700: #A52020;
