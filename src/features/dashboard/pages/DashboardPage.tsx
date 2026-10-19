@@ -54,7 +54,7 @@ const CHART_CONFIG = {
 
 function budgetStatusClasses(percent: number) {
   if (percent > 100) return { text: "text-destructive", bar: "bg-destructive" }
-  if (percent >= 80) return { text: "text-warning", bar: "bg-warning" }
+  if (percent >= 80) return { text: "text-warning-700", bar: "bg-warning" }
   return { text: "text-success", bar: "bg-success" }
 }
 
@@ -178,6 +178,7 @@ export function DashboardPage() {
                   <p className={`font-semibold ${status.text}`}>{budget.percent} %</p>
                 </div>
                 <Progress
+                  aria-label={`Budget ${budget.name}`}
                   value={Math.min(budget.percent, 100)}
                   className="mt-1 h-2"
                   indicatorClassName={status.bar}

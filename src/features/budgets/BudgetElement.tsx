@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const STATUS_UI = {
 		ok : {icon: Check, text: "text-success", background: "bg-success-100", bar:"bg-success"},
-		warning : {icon: TriangleAlert, text: "text-foreground", background:"bg-warning", bar:"bg-warning"},
+		warning : {icon: TriangleAlert, text: "text-warning-foreground", background:"bg-warning", bar:"bg-warning"},
 		over : {icon: CircleAlert, text: "text-destructive",background: "bg-destructive/10", bar:"bg-destructive"},
 	}
 
@@ -67,7 +67,8 @@ export function BudgetElement({ budget, category, spentCents }:  BudgetElementPr
 			</CardHeader>
 			<CardContent>
 				{/* Progress bar */}
-				<Progress 
+				<Progress
+				aria-label={`Budget ${category?.name ?? ""}`}
 				value={spentCents / budget.capCents * 100} 
 				indicatorClassName={STATUS_UI[status].bar}/>
 				{/* Actuel / max */}

@@ -93,7 +93,7 @@ export function OperationsListPage() {
 		{/* Types */}
       <div className="mt-6 flex flex-wrap items-end gap-3">
         <Select value={typeFilter} onValueChange={(value) => updateTypeFilter(value as typeof typeFilter)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Filtrer par type"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous types</SelectItem>
             <SelectItem value="income">Revenus</SelectItem>
@@ -103,7 +103,7 @@ export function OperationsListPage() {
 
 		{/* Catégories */}
         <Select value={categoryFilter} onValueChange={updateCategoryFilter}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Filtrer par catégorie"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Toutes catégories</SelectItem>
             {categories.map((category) => (
@@ -119,7 +119,7 @@ export function OperationsListPage() {
 
 		{/* Date */}
         <Select value={sort} onValueChange={(value) => setSort(value as SortOption)}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Trier les opérations"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="date-desc">Date (récent → ancien)</SelectItem>
             <SelectItem value="date-asc">Date (ancien → récent)</SelectItem>
