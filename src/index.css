@@ -90,10 +90,10 @@
     --secondary: #FFFFFF;
     --secondary-foreground: #074980;
     --muted: #EAEAEA;
-    --muted-foreground: #9E9E9E;
+    --muted-foreground: #666666;
     --accent: #E6EEF5;
     --accent-foreground: #074980;
-    --destructive: #D93636;
+    --destructive: #C62828;
     --destructive-foreground: #FFFFFF;
     --border: #D6D6D6;
     --input: #D6D6D6;
@@ -106,7 +106,7 @@
     --radius: 0.625rem;
     --success-500: #2E7D32;
     --success-100: #E6F4EA;
-    --warning-500: #E68A00;
+    --warning-500: #9A5700;
     --warning-100: #FFF3E0;
     --danger-100: #FDECEC;
     --danger-700: #A52020;
