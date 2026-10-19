@@ -67,7 +67,8 @@ export function BudgetElement({ budget, category, spentCents }:  BudgetElementPr
 			</CardHeader>
 			<CardContent>
 				{/* Progress bar */}
-				<Progress 
+				<Progress
+				aria-label={`Budget ${category?.name ?? ""}`}
 				value={spentCents / budget.capCents * 100} 
 				indicatorClassName={STATUS_UI[status].bar}/>
 				{/* Actuel / max */}

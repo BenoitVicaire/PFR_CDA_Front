@@ -178,6 +178,7 @@ export function DashboardPage() {
                   <p className={`font-semibold ${status.text}`}>{budget.percent} %</p>
                 </div>
                 <Progress
+                  aria-label={`Budget ${budget.name}`}
                   value={Math.min(budget.percent, 100)}
                   className="mt-1 h-2"
                   indicatorClassName={status.bar}
