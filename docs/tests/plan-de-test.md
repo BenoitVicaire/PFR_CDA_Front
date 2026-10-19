@@ -23,6 +23,7 @@ Ce document décrit comment la fonctionnalité centrale de l'application, la ges
 | EF-B02 | US-007, US-008 | Modification et suppression d'une opération |
 | EF-B03 | US-009 | Liste, filtres, tri et pagination |
 | EF-E01 | US-016 | Répercussion des saisies sur les alertes de budget du dashboard |
+| ENF-U04 | | Accessibilité WCAG 2.1 AA des écrans du fil rouge |
 
 ### 2.2 Hors périmètre de cette version
 
@@ -30,7 +31,8 @@ Ce document décrit comment la fonctionnalité centrale de l'application, la ges
 - Gestion des catégories personnalisées et création de budgets.
 - Recherche dans les libellés (EF-B04), non encore développée.
 - Purge des opérations supprimées au bout de 30 jours (traitement côté serveur).
-- Tests de performance (ENF01, ENF02) et d'accessibilité automatisés.
+- Tests de performance (ENF01, ENF02).
+- Accessibilité des écrans hors fil rouge (catégories, budgets, statistiques, profil).
 - Tests d'API : le backend Laravel n'existe pas encore.
 
 ## 3. Stratégie de test
@@ -51,7 +53,13 @@ Conséquences :
 - ils survivent à la migration vers Laravel, puisque seule la couche de services change ;
 - ils ne valident pas l'intégration réelle avec Firebase ou Laravel, ce qui relève d'un niveau de test ultérieur (voir section 9).
 
-### 3.3 Approche des cas de test
+### 3.3 Accessibilité automatisée
+
+Les contrôles génériques d'accessibilité reposent sur axe-core (Deque), branché à Cypress par `cypress-axe`. Chaque écran du fil rouge est analysé selon les règles WCAG 2.1 niveaux A et AA : noms accessibles des boutons et champs, labels de formulaires, rôles ARIA, hiérarchie des titres, langue de la page, contraste des couleurs.
+
+Un outil automatique détecte une partie seulement des défauts d'accessibilité. Il est complété par un test de navigation au clavier (ordre de tabulation du formulaire). Le jugement humain reste nécessaire pour le sens des textes alternatifs et la pertinence de l'ordre de lecture.
+
+### 3.4 Approche des cas de test
 
 - Un cas nominal par fonctionnalité, puis les cas d'erreur et les limites utiles.
 - Chaque cas est indépendant : il se connecte lui-même et ne suppose aucun état laissé par un autre test.
@@ -133,6 +141,19 @@ Préconditions communes : utilisateur connecté, page `/operations` affichée av
 | CT-BUD-01 | US-016 | L | Saisir 120 € en Alimentation (plafond 100 €) | Le dashboard affiche « 1 catégorie en dépassement » | `operations-dashboard.cy.ts` |
 | CT-BUD-02 | US-016 | L | Saisir 85 € en Alimentation (85 % du plafond) | Le dashboard affiche « 1 catégorie à surveiller » | `operations-dashboard.cy.ts` |
 
+### 5.6 Accessibilité
+
+| ID | Exigence | Type | Scénario | Résultat attendu | Spec |
+|---|---|---|---|---|---|
+| CT-A11Y-01 | ENF-U04 | N | Analyser la page de connexion (hors contraste) | Aucune violation WCAG 2.1 A et AA | `accessibility.cy.ts` |
+| CT-A11Y-02 | ENF-U04 | N | Analyser le dashboard (hors contraste) | Aucune violation | `accessibility.cy.ts` |
+| CT-A11Y-03 | ENF-U04 | N | Analyser la liste des opérations (hors contraste) | Aucune violation | `accessibility.cy.ts` |
+| CT-A11Y-04 | ENF-U04 | N | Analyser le formulaire de saisie (hors contraste) | Aucune violation | `accessibility.cy.ts` |
+| CT-A11Y-05 | ENF-U04 | N | Analyser la modale de suppression ouverte (hors contraste) | Aucune violation | `accessibility.cy.ts` |
+| CT-A11Y-06 | ENF-U04 | N | Parcourir le formulaire avec la touche Tab | Le focus passe du montant à la catégorie, puis du libellé à « Annuler » et « Valider » | `accessibility.cy.ts` |
+| CT-A11Y-07 | ENF-U04 | N | Contrôler le contraste de la page de connexion | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` (désactivé, écart connu) |
+| CT-A11Y-08 | ENF-U04 | N | Contrôler le contraste de la liste des opérations | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` (désactivé, écart connu) |
+
 ## 6. Critères d'entrée et de sortie
 
 Entrée : l'application compile (`pnpm build`) et le jeu de données de test est à jour.
@@ -160,14 +181,16 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 | US-006 | Le scénario Gherkin prévoit que le bouton « Valider » soit désactivé quand le montant est invalide. L'application laisse le bouton actif et affiche l'erreur à la soumission. | Le test CT-OP-03 vérifie le comportement réel (message d'erreur, aucun enregistrement). Écart à arbitrer : adapter l'US ou le formulaire. |
 | US-006 | Le critère « le solde du dashboard est mis à jour » est vérifié sur le total des dépenses (CT-OP-17). | Suffisant pour cette version. |
 | EF-B02 | La suppression est logique (`deletedAt`). Le test vérifie la disparition de la ligne, pas le maintien de la donnée côté base. | À couvrir par un test d'API quand le backend Laravel existera. |
+| ENF-U04 | Le contrôle de contraste révèle des textes sous le ratio 4,5:1 exigé par WCAG AA. Cause identifiée : la couleur `--muted-foreground` (#9E9E9E, ratio 2,7:1 sur fond blanc), les textes en `warning` (#E68A00, ratio 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, ratio 4,3:1). | Les cas CT-A11Y-07 et CT-A11Y-08 sont écrits mais désactivés, et le contraste est exclu de CT-A11Y-01 à 05, pour ne pas bloquer le pipeline. Correction à prévoir sur les tokens du design système (P4-05), puis réactivation. |
+| ENF-U04 | Les barres de progression des budgets n'avaient pas de nom accessible. | Corrigé : `aria-label` ajouté sur le dashboard et sur les cartes de budget. |
 | Général | Les données sont en mémoire : aucun test ne valide la persistance réelle. | Voir section 9. |
 
 ## 9. Évolutions prévues
 
-1. Tests unitaires (Vitest) de la logique pure : calcul des seuils de budget (`getStatus`, `groupBudgetsByAlert`), conversion des montants en centimes, schémas Zod.
-2. Tests d'API (PHPUnit) sur le backend Laravel, puis quelques parcours E2E exécutés contre l'API réelle.
-3. Extension à l'inscription, aux catégories et aux budgets.
-4. Contrôle d'accessibilité automatisé (WCAG 2.1 AA, ENF-U04).
+1. Correction des contrastes et réactivation de CT-A11Y-07 et CT-A11Y-08, avec extension de l'analyse aux autres écrans.
+2. Tests unitaires (Vitest) de la logique pure : calcul des seuils de budget (`getStatus`, `groupBudgetsByAlert`), conversion des montants en centimes, schémas Zod.
+3. Tests d'API (PHPUnit) sur le backend Laravel, puis quelques parcours E2E exécutés contre l'API réelle.
+4. Extension à l'inscription, aux catégories et aux budgets.
 
 ## 10. Résultats d'exécution
 
