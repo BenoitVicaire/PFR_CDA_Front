@@ -93,17 +93,17 @@ export function EditBudgetPage() {
 									size="sm"
 									className="mt-3 w-full"
 								>
-									Supprimer cette opération
+									Supprimer ce budget
 								</Button>
 							</AlertDialogTrigger>
 							<AlertDialogContent>
 								<AlertDialogHeader>
 									<AlertDialogTitle>
-										Supprimer cette opération ?
+										Supprimer ce budget ?
 									</AlertDialogTitle>
 									<AlertDialogDescription>
-										L’opération sera supprimée de votre
-										liste et de vos calculs.
+										Ce budget sera supprimé définitivement.
+										Vos opérations sont conservées.
 									</AlertDialogDescription>
 								</AlertDialogHeader>
 								<AlertDialogFooter>
