@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useState } from "react"
+import { Controller, useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
@@ -12,10 +12,9 @@ import {
   type OperationFormInput,
   type OperationFormValues,
 } from "@/features/operations/schemas"
-import { useAuth } from "@/hooks/useAuth"
+import { useCategories } from "@/hooks/useCategories"
 import { toLocalDate } from "@/lib/date"
-import { firebaseCategoryService } from "@/services/firebase/category.service"
-import type { Category } from "@/types"
+
 
 function shiftYears(years: number) {
   const date = new Date()
@@ -35,19 +34,14 @@ interface OperationFormProps {
 }
 
 export function OperationForm({ defaultValues, submitLabel, onSubmit, onCancel }: OperationFormProps) {
-  const { user } = useAuth()
-  const [categories, setCategories] = useState<Category[]>([])
+  const { categories, error: categoriesError } = useCategories()
   const [formError, setFormError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!user) return
-    firebaseCategoryService.list(user.id).then(setCategories)
-  }, [user])
 
   const {
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<OperationFormInput, unknown, OperationFormValues>({
     resolver: zodResolver(operationSchema),
@@ -59,6 +53,10 @@ export function OperationForm({ defaultValues, submitLabel, onSubmit, onCancel }
       ...defaultValues,
     },
   })
+
+  // EF-B01 : une dépense ne propose que des catégories de dépense, un revenu que des catégories de revenu.
+  const type = useWatch({ control, name: "type" })
+  const typeCategories = categories.filter((category) => category.type === type)
 
   async function submit(values: OperationFormValues) {
     setFormError(null)
@@ -81,7 +79,10 @@ export function OperationForm({ defaultValues, submitLabel, onSubmit, onCancel }
               <RadioGroup
                 className="flex flex-row gap-6"
                 value={field.value}
-                onValueChange={field.onChange}
+                onValueChange={(value) => {
+                  field.onChange(value)
+                  setValue("categoryId", "")
+                }}
               >
                 <label className="flex items-center gap-2 text-sm text-primary">
                   <RadioGroupItem value="income" />
@@ -121,7 +122,7 @@ export function OperationForm({ defaultValues, submitLabel, onSubmit, onCancel }
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((category) => (
+                  {typeCategories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
                     </SelectItem>
@@ -131,6 +132,7 @@ export function OperationForm({ defaultValues, submitLabel, onSubmit, onCancel }
             )}
           />
           <FieldError errors={[errors.categoryId]} />
+          {categoriesError ? <FieldError>{categoriesError}</FieldError> : null}
         </Field>
 
         <Field data-invalid={!!errors.date}>
