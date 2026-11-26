@@ -26,9 +26,19 @@ interface MonthPickerProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
+  /** À fournir avec `labelId` pour relier le bouton à un libellé visible (ENF-U01). */
+  id?: string
+  labelId?: string
 }
 
-export function MonthPicker({ value, onChange, placeholder = "Tous les mois", disabled = false }: MonthPickerProps) {
+export function MonthPicker({
+  value,
+  onChange,
+  placeholder = "Tous les mois",
+  disabled = false,
+  id,
+  labelId,
+}: MonthPickerProps) {
   const [open, setOpen] = useState(false)
   const [year, setYear] = useState(() => (value ? Number(value.slice(0, 4)) : new Date().getFullYear()))
 
@@ -47,7 +57,10 @@ export function MonthPicker({ value, onChange, placeholder = "Tous les mois", di
         <Button
           type="button"
           variant="outline"
-		  disabled={disabled}
+          id={id}
+          // Le bouton se nomme avec le libellé puis son propre texte : « Mois juin 2026 ».
+          aria-labelledby={labelId && id ? `${labelId} ${id}` : undefined}
+          disabled={disabled}
           className={cn("justify-start font-normal", !value && "text-muted-foreground")}
         >
           <Calendar />

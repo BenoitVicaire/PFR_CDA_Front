@@ -113,7 +113,7 @@ export function BudgetForm({
 				</Field>
 				{/* Mois auquel appliqué le budget */}
 				<Field data-invalid={!!errors.month}>
-					<FieldLabel htmlFor="month" className="text-primary">
+					<FieldLabel id="month-label" htmlFor="month" className="text-primary">
 						Mois
 					</FieldLabel>
 					<Controller
@@ -121,6 +121,8 @@ export function BudgetForm({
 						name="month"
 						render={({ field }) => (
 							<MonthPicker
+								id="month"
+								labelId="month-label"
 								value={field.value}
 								onChange={field.onChange}
 								disabled={editMode}
