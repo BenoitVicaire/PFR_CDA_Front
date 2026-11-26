@@ -19,6 +19,36 @@ describe("Erreurs de chargement (ENF-F03)", () => {
     cy.contains("restants").should("not.exist")
   })
 
+  const PAGES = [
+    { to: "Dashboard", message: "Impossible de charger le tableau de bord." },
+    { to: "Opérations", message: "Impossible de charger les opérations." },
+    { to: "Catégories", message: "Impossible de charger les catégories." },
+  ]
+
+  PAGES.forEach(({ to, message }) => {
+    it(`CT-ERR-03 : la page ${to} affiche l'erreur de chargement`, () => {
+      cy.navigateTo("Budgets")
+      cy.contains("a", "Modifier").should("be.visible")
+      breakServices()
+      cy.navigateTo(to)
+
+      cy.get('[role="alert"]').should("contain", message)
+      cy.contains("button", "Réessayer").should("be.visible")
+    })
+  })
+
+  it("CT-ERR-04 : un échec de suppression d'une opération est signalé", () => {
+    cy.navigateTo("Opérations")
+    cy.get("tbody tr a").first().click()
+    cy.contains("button", "Supprimer cette opération").should("be.visible")
+    breakServices()
+    cy.contains("button", "Supprimer cette opération").click()
+    cy.get('[role="alertdialog"]').contains("button", "Supprimer").click()
+
+    cy.contains("La suppression a échoué").should("be.visible")
+    cy.location("pathname").should("match", /^\/operations\/.+/)
+  })
+
   it("CT-ERR-02 : un échec de suppression d'un budget est signalé", () => {
     cy.navigateTo("Budgets")
     cy.contains("a", "Modifier").click()
