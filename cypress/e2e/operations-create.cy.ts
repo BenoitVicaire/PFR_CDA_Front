@@ -59,3 +59,15 @@ describe("Opérations : saisie (US-006, EF-B01)", () => {
     cy.contains("Saisie annulée").should("not.exist")
   })
 })
+
+describe("Opérations : date par défaut (EF-B01)", () => {
+  it("CT-OP-18 : propose la date locale, même juste après minuit", () => {
+    // 1er juin 2026 à 00 h 30 heure locale : la date UTC est encore le 31 mai en France.
+    cy.clock(new Date(2026, 5, 1, 0, 30).getTime(), ["Date"])
+    cy.login()
+    cy.navigateTo("Opérations")
+    cy.contains("a", "Ajouter").click()
+
+    cy.get("#date").should("have.value", "2026-06-01")
+  })
+})

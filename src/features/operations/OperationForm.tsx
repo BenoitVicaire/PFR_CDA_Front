@@ -13,16 +13,17 @@ import {
   type OperationFormValues,
 } from "@/features/operations/schemas"
 import { useAuth } from "@/hooks/useAuth"
+import { toLocalDate } from "@/lib/date"
 import { firebaseCategoryService } from "@/services/firebase/category.service"
 import type { Category } from "@/types"
 
 function shiftYears(years: number) {
   const date = new Date()
   date.setFullYear(date.getFullYear() + years)
-  return date.toISOString().slice(0, 10)
+  return toLocalDate(date)
 }
 
-const TODAY = new Date().toISOString().slice(0, 10)
+const TODAY = toLocalDate()
 const MIN_DATE = shiftYears(-5)
 const MAX_DATE = shiftYears(5)
 
