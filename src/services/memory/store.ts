@@ -9,6 +9,10 @@ let sequence = 0
  * Les données vivent le temps du chargement de la page : un rechargement les réinitialise.
  */
 export function getUserData(userId: string): UserData {
+  // Les tests e2e posent ce drapeau pour simuler une panne réseau ou un refus de droits.
+  if ((window as Window & { e2eFailServices?: boolean }).e2eFailServices) {
+    throw new Error("Panne simulée")
+  }
   let data = dataByUser.get(userId)
   if (!data) {
     data = userId === DEMO_USER.id ? createDemoData() : createEmptyData()

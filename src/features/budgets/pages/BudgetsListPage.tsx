@@ -1,6 +1,7 @@
 import { MonthPicker } from "@/components/MonthPicker";
 import { Button } from "@/components/ui/button";
 import { useCategories } from "@/hooks/useCategories";
+import { LoadError } from "@/components/LoadError";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BudgetElement } from "../BudgetElement";
@@ -23,7 +24,7 @@ export function BudgetsListPage() {
 	const [error, setError] = useState<string | null>(null)
 
 	const [monthFilter, setMonthFilter] = useState<string>(currentMonth);
-	const { categoryById } = useCategories();
+	const { categoryById, error: categoriesError } = useCategories();
 
 	function updateMonthFilter(value: string) {
 		setMonthFilter(value);
@@ -43,7 +44,7 @@ export function BudgetsListPage() {
 		  setOperations(operation)
 		  setBudgets(budget)
 		  setError(null)
-		}).catch(()=> setError("Impossible de charger les budgets"))
+		}).catch(()=> setError("Impossible de charger les budgets."))
 		.finally(()=> setLoading(false))
 	  }, [user,monthFilter])
 
@@ -86,25 +87,29 @@ export function BudgetsListPage() {
 
 			{loading ? (
 				<p className="mt-6 text-muted-foreground">Chargement…</p>
-			) : error ? (
-				<p role="alert" className="mt-6 text-destructive">{error}</p>
-			) : (
-				// US-016 : ne s'affiche que s'il y a un budget dépassé ou à surveiller.
-				<div className="mt-4">
-					<OverBudgetAlert {...groupBudgetsByAlert(budgets, operations)} operations={operations} />
+			) : error || categoriesError ? (
+				<div className="mt-6">
+					<LoadError message={error ?? categoriesError!} />
 				</div>
+			) : (
+				<>
+					{/* US-016 : ne s'affiche que s'il y a un budget dépassé ou à surveiller. */}
+					<div className="mt-4">
+						<OverBudgetAlert {...groupBudgetsByAlert(budgets, operations)} operations={operations} />
+					</div>
+					{/* Composant BudgetElement : Rendu des card de chaque budget */}
+					<section className="space-y-4 mt-4">
+						{budgets.map((b) => (
+							<BudgetElement
+								key={b.id}
+								budget={b}
+								category={categoryById.get(b.categoryId)}
+								spentCents={getSpentCents(b, operations)}
+							/>
+						))}
+					</section>
+				</>
 			)}
-			{/* Composant BudgetElement : Rendu des card de chaque budget */}
-			<section className="space-y-4 mt-4">
-				{budgets.map((b) => (
-					<BudgetElement
-						key={b.id}
-						budget={b}
-						category={categoryById.get(b.categoryId)}
-						spentCents={getSpentCents(b, operations)}
-					/>
-				))}
-			</section>
 		</section>
 	);
 }
