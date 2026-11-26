@@ -7,7 +7,8 @@ import { BudgetElement } from "../BudgetElement";
 import { useAuth } from "@/hooks/useAuth";
 import { firebaseOperationService } from "@/services/firebase/operation.service";
 import type { Operation } from "@/types/operation";
-import { getSpentCents } from "../budget-utils";
+import { getSpentCents, groupBudgetsByAlert } from "../budget-utils";
+import { OverBudgetAlert } from "../OverBudgetAlert";
 import type { Budget } from "@/types/budget";
 import { firebaseBudgetService } from "@/services/firebase/budget.service";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -87,21 +88,10 @@ export function BudgetsListPage() {
 			) : error ? (
 				<p role="alert" className="mt-6 text-destructive">{error}</p>
 			) : (
-				// Alerte à refacto
-				<Link
-					to="/budgets"
-					className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 mt-4"
-				>
-					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-warning-foreground">
-						!
-					</span>
-					<p className="flex-1 text-sm font-medium text-primary">
-						2 catégories en dépassement
-					</p>
-					<span className="shrink-0 text-xs font-semibold text-warning-700">
-						Voir →
-					</span>
-				</Link>
+				// US-016 : ne s'affiche que s'il y a un budget dépassé ou à surveiller.
+				<div className="mt-4">
+					<OverBudgetAlert {...groupBudgetsByAlert(budgets, operations)} operations={operations} />
+				</div>
 			)}
 			{/* Composant BudgetElement : Rendu des card de chaque budget */}
 			<section className="space-y-4 mt-4">
