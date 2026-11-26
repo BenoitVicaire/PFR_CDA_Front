@@ -44,6 +44,17 @@ describe("Accessibilité WCAG 2.1 AA (ENF-U04)", () => {
     })
   })
 
+  describe("Libellés des champs", () => {
+    it("CT-A11Y-14 : le sélecteur de mois du budget est relié à son libellé", () => {
+      cy.login()
+      cy.navigateTo("Budgets")
+      cy.get('a[href="/budgets/new"]').first().click()
+
+      cy.get('label[for="month"]').should("have.text", "Mois")
+      cy.get("button#month").should("have.attr", "aria-labelledby", "month-label month")
+    })
+  })
+
   describe("Navigation au clavier", () => {
     it("CT-A11Y-06 : le formulaire de saisie se parcourt avec la touche Tab", () => {
       cy.login()
