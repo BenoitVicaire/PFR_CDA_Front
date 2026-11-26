@@ -51,6 +51,16 @@ describe("Opérations : saisie (US-006, EF-B01)", () => {
     cy.contains("tr", "Voyage prévu").should("contain", futureDate)
   })
 
+  it("CT-OP-20 : refuse une date à plus de 5 ans", () => {
+    const tooFar = `${new Date().getFullYear() + 6}-06-15`
+
+    cy.fillOperationForm({ amount: "80", category: "Loisirs", date: tooFar })
+    cy.contains("button", "Valider").click()
+
+    cy.contains("La date doit être à 5 ans près d'aujourd'hui").should("be.visible")
+    cy.location("pathname").should("eq", "/operations/new")
+  })
+
   it("CT-OP-06 : n'enregistre rien lorsque la saisie est annulée", () => {
     cy.fillOperationForm({ amount: "20", category: "Divers", label: "Saisie annulée" })
     cy.contains("button", "Annuler").click()
