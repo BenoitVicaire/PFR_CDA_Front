@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 
+import { AuthLayout } from "@/components/layout/AuthLayout"
 import { PrivateLayout } from "@/components/layout/PrivateLayout"
 import { PublicLayout } from "@/components/layout/PublicLayout"
 import { RedirectIfAuthenticated } from "@/features/auth/RedirectIfAuthenticated"
@@ -35,8 +36,13 @@ export const router = createBrowserRouter([
         element: <RedirectIfAuthenticated />,
         children: [
           { path: "/", element: <HomePage /> },
-          { path: "/inscription", element: <RegisterPage /> },
-          { path: "/connexion", element: <LoginPage /> },
+          {
+            element: <AuthLayout />,
+            children: [
+              { path: "/inscription", element: <RegisterPage /> },
+              { path: "/connexion", element: <LoginPage /> },
+            ],
+          },
         ],
       },
       {
