@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import type { Operation } from "@/types/operation"
 import { useAuth } from "@/hooks/useAuth"
 import { firebaseOperationService } from "@/services/firebase/operation.service"
+import { toLocalMonth } from "@/lib/date"
 import { totalTypeForMonth } from "@/lib/utils"
 import { Spinner } from "@/components/ui/spinner"
 import { OverBudgetAlert } from "@/features/budgets/OverBudgetAlert"
@@ -93,10 +94,10 @@ export function DashboardPage() {
 	const [alerts, setAlerts] = useState<{over: Budget[]; warning: Budget[]}>()
 
 	const currentDate = new Date()
-	const currentMonth = `${currentDate.getFullYear()}-${(String(currentDate.getMonth()+1)).padStart(2, "0")}`
+	const currentMonth = toLocalMonth(currentDate)
 
 	const lastMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
-	const lastMonth = `${lastMonthDate.getFullYear()}-${String(lastMonthDate.getMonth() + 1).padStart(2, "0")}`
+	const lastMonth = toLocalMonth(lastMonthDate)
 	
 
 	const totalIncomeForCurrentMonth=totalTypeForMonth(operations,"income",currentMonth)

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useCategories } from "@/hooks/useCategories";
 
+import { toLocalMonth } from "@/lib/date";
 import type { BudgetFormProps } from "@/types/budget";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -41,7 +42,7 @@ export function BudgetForm({
 }: BudgetFormProps) {
 	const { categories } = useCategories();
 	const [formError, setFormError] = useState<string | null>(null);
-	const currentMonth = new Date().toISOString().slice(0, 7); // "2026-10"
+	const currentMonth = toLocalMonth();
 	const {
 		register,
 		control,
