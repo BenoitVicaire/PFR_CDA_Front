@@ -12,6 +12,17 @@ describe("Budgets (US-014, US-016)", () => {
     cy.contains("en dépassement").should("not.exist")
   })
 
+  it("CT-BUD-05 : refuse un second budget pour la même catégorie et le même mois", () => {
+    cy.navigateTo("Budgets")
+    cy.contains("a", "Ajouter un budget").click()
+    cy.selectOption("#categoryId", "Alimentation")
+    cy.get("#amount").type("50")
+    cy.contains("button", "Valider").click()
+
+    cy.contains("Un budget existe déjà").should("be.visible")
+    cy.location("pathname").should("eq", "/budgets/new")
+  })
+
   it("CT-BUD-04 : détaille les dépassements dans une fenêtre titrée et accessible", () => {
     cy.navigateTo("Opérations")
     cy.contains("a", "Ajouter").click()

@@ -4,6 +4,7 @@ import { BudgetForm } from "../BudgetForm";
 import { useAuth } from "@/hooks/useAuth";
 import { firebaseBudgetService } from "@/services/firebase/budget.service";
 import type { BudgetFormValues } from "../schemas";
+import { DuplicateBudgetError } from "../errors";
 
 
 export function NewBudget() {
@@ -12,6 +13,11 @@ export function NewBudget() {
 
 	async function handleSubmit(values: BudgetFormValues) {
 		if (!user) return
+		// Vérification côté client ; l'API Laravel devra aussi l'imposer (contrainte unique en base).
+		const monthBudgets = await firebaseBudgetService.list(user.id, values.month)
+		if (monthBudgets.some((budget) => budget.categoryId === values.categoryId)) {
+			throw new DuplicateBudgetError()
+		}
 		await firebaseBudgetService.create(user.id, {
 		  categoryId: values.categoryId,
 		  month: values.month,
