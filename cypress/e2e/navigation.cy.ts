@@ -8,6 +8,8 @@ describe("Navigation sur mobile (ENF-C02)", () => {
     cy.get('button[aria-label="Ouvrir le menu"]').click()
     cy.contains('[role="menuitem"]', "Catégories").click()
     cy.location("pathname").should("eq", "/categories")
+    // Le menu se ferme avec une animation : le rouvrir avant sa disparition le referme aussitôt.
+    cy.get('[role="menu"]').should("not.exist")
 
     cy.get('button[aria-label="Ouvrir le menu"]').click()
     cy.contains('[role="menuitem"]', "Statistiques").click()
