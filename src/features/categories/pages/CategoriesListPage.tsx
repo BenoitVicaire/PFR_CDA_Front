@@ -1,22 +1,9 @@
-import { useEffect, useState } from "react"
-
+import { LoadError } from "@/components/LoadError"
 import { CATEGORY_ICONS } from "@/features/categories/category-icons"
-import { useAuth } from "@/hooks/useAuth"
-import { firebaseCategoryService } from "@/services/firebase/category.service"
-import type { Category } from "@/types"
+import { useCategories } from "@/hooks/useCategories"
 
 export function CategoriesListPage() {
-  const { user } = useAuth()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!user) return
-    firebaseCategoryService.list(user.id).then((result) => {
-      setCategories(result)
-      setLoading(false)
-    })
-  }, [user])
+  const { categories, loading, error } = useCategories()
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
@@ -24,6 +11,10 @@ export function CategoriesListPage() {
 
       {loading ? (
         <p className="mt-4 text-muted-foreground">Chargement…</p>
+      ) : error ? (
+        <div className="mt-6">
+          <LoadError message={error} />
+        </div>
       ) : (
         <ul className="mt-6 flex flex-col gap-2">
           {categories.map((category) => {

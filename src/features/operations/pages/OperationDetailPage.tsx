@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { LoadError } from "@/components/LoadError"
 import { Button } from "@/components/ui/button"
 import { OperationForm } from "@/features/operations/OperationForm"
 import type { OperationFormValues } from "@/features/operations/schemas"
@@ -26,13 +27,16 @@ export function OperationDetailPage() {
   const navigate = useNavigate()
   const [operation, setOperation] = useState<Operation | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user || !id) return
-    firebaseOperationService.get(user.id, id).then((result) => {
-      setOperation(result)
-      setLoading(false)
-    })
+    firebaseOperationService
+      .get(user.id, id)
+      .then(setOperation)
+      .catch(() => setLoadError("Impossible de charger cette opération."))
+      .finally(() => setLoading(false))
   }, [user, id])
 
   async function handleSubmit(values: OperationFormValues) {
@@ -49,8 +53,13 @@ export function OperationDetailPage() {
 
   async function handleDelete() {
     if (!user || !id) return
-    await firebaseOperationService.softDelete(user.id, id)
-    navigate("/operations")
+    setDeleteError(null)
+    try {
+      await firebaseOperationService.softDelete(user.id, id)
+      navigate("/operations")
+    } catch {
+      setDeleteError("La suppression a échoué, réessayez.")
+    }
   }
 
   return (
@@ -65,6 +74,8 @@ export function OperationDetailPage() {
 
         {loading ? (
           <p className="text-muted-foreground">Chargement…</p>
+        ) : loadError ? (
+          <LoadError message={loadError} />
         ) : !operation ? (
           <p className="text-muted-foreground">Opération introuvable.</p>
         ) : (
@@ -81,6 +92,10 @@ export function OperationDetailPage() {
               onSubmit={handleSubmit}
               onCancel={() => navigate("/operations")}
             />
+
+            {deleteError ? (
+              <p role="alert" className="mt-3 text-sm text-destructive">{deleteError}</p>
+            ) : null}
 
             <AlertDialog>
               <AlertDialogTrigger asChild>

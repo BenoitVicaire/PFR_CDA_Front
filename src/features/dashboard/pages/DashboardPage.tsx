@@ -1,6 +1,7 @@
 import { ChevronDown, Menu } from "lucide-react"
 import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from "recharts"
 
+import { LoadError } from "@/components/LoadError"
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
 import { useEffect, useState } from "react"
@@ -89,6 +90,7 @@ export function DashboardPage() {
 
 	const { user } = useAuth()
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 
 	const [operations,setOperations] = useState<Operation[]>([])
 	const [alerts, setAlerts] = useState<{over: Budget[]; warning: Budget[]}>()
@@ -110,16 +112,17 @@ export function DashboardPage() {
 
 	useEffect(()=>{
 		if(!user)return
-		firebaseOperationService.list(user.id).then(
-			(operationsResult) => {
-			setOperations(operationsResult)
-			setLoading(false)
-			})
+		firebaseOperationService.list(user.id)
+			.then(setOperations)
+			.catch(() => setError("Impossible de charger le tableau de bord."))
+			.finally(() => setLoading(false))
 	},[user])
 
 	useEffect(()=>{
 		if(!user) return
-		getOverBudget(user.id, currentMonth).then(setAlerts)
+		getOverBudget(user.id, currentMonth)
+			.then(setAlerts)
+			.catch(() => setError("Impossible de charger le tableau de bord."))
 	}, [user, currentMonth])
 
 	
@@ -132,6 +135,8 @@ export function DashboardPage() {
       </div>
 	  {loading?(
 		<Spinner className="size-6 text-primary" />
+	  ): error ? (
+		<LoadError message={error} />
 	  ):(
       <section className="rounded-xl border border-border bg-card p-4">
 		{/* Balance */}
@@ -156,7 +161,7 @@ export function DashboardPage() {
 	  )}
 
 	  {/* Bandereau d'alerte */}
-	  { alerts && <OverBudgetAlert
+	  { !error && alerts && <OverBudgetAlert
 	  	over = {alerts.over}
 		warning = { alerts.warning}
 		operations={ operations }

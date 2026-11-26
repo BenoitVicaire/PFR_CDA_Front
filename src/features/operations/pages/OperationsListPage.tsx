@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 
+import { LoadError } from "@/components/LoadError"
 import { MonthPicker } from "@/components/MonthPicker"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,7 +22,8 @@ export function OperationsListPage() {
   const { user } = useAuth()
   const [operations, setOperations] = useState<Operation[]>([])
   const [loading, setLoading] = useState(true)
-  const { categories, categoryById, loading: categoriesLoading } = useCategories()
+  const [error, setError] = useState<string | null>(null)
+  const { categories, categoryById, loading: categoriesLoading, error: categoriesError } = useCategories()
 
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
@@ -31,10 +33,11 @@ export function OperationsListPage() {
 
   useEffect(() => {
     if (!user) return
-    firebaseOperationService.list(user.id).then((result) => {
-      setOperations(result)
-      setLoading(false)
-    })
+    firebaseOperationService
+      .list(user.id)
+      .then(setOperations)
+      .catch(() => setError("Impossible de charger les opérations."))
+      .finally(() => setLoading(false))
   }, [user])
 
   function updateTypeFilter(value: "all" | "income" | "expense") {
@@ -136,6 +139,10 @@ export function OperationsListPage() {
 
       {loading || categoriesLoading ? (
         <p className="mt-6 text-muted-foreground">Chargement…</p>
+      ) : error || categoriesError ? (
+        <div className="mt-6">
+          <LoadError message={error ?? categoriesError!} />
+        </div>
       ) : (
         <Card className="mt-6">
           <CardContent>
