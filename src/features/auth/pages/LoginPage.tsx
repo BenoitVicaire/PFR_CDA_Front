@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group"
 import { toAuthErrorMessage } from "@/features/auth/auth-errors"
+import { getRedirectPath } from "@/features/auth/redirect"
 import { loginSchema, type LoginFormValues } from "@/features/auth/schemas"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -34,7 +35,7 @@ export function LoginPage() {
     setFormError(null)
     try {
       await login(values.email, values.password, { rememberMe: values.rememberMe })
-      navigate(searchParams.get("redirect") ?? "/dashboard", { replace: true })
+      navigate(getRedirectPath(searchParams), { replace: true })
     } catch (error) {
       setFormError(toAuthErrorMessage(error, "login"))
     }

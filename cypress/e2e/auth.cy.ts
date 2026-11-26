@@ -34,6 +34,17 @@ describe("Authentification (prérequis du fil rouge)", () => {
     cy.location("pathname").should("eq", "/connexion")
   })
 
+  it("CT-AUTH-06 : revient à la page demandée après la connexion", () => {
+    cy.visit("/operations")
+    cy.location("pathname").should("eq", "/connexion")
+    cy.get("#email").type(DEMO_USER.email)
+    cy.get("#password").type(DEMO_USER.password, { log: false })
+    cy.contains("button", "Se connecter").click()
+
+    cy.contains("h1", "Opérations").should("be.visible")
+    cy.location("pathname").should("eq", "/operations")
+  })
+
   it("CT-AUTH-04 : inscrit un nouveau compte avec ses 12 catégories", () => {
     cy.visit("/inscription")
     fillRegisterForm("nouveau@exemple.test")
