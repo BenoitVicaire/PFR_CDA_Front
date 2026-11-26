@@ -60,3 +60,14 @@ Les montants sont manipulés en **centimes** (entiers) pour éviter les erreurs 
 Le backend actuel est **Firebase**. Il sera remplacé par une **[API Laravel](https://laravel.com/docs)** dans une seconde phase.
 
 Pour que ce passage ne touche qu'une seule couche, les composants n'importent jamais le SDK Firebase : tout accès aux données passe par les interfaces de `src/services/`. Migrer vers Laravel revient à écrire de nouvelles implémentations de ces services, sans réécrire les écrans.
+
+## Tests
+
+Les tests de bout en bout utilisent [Cypress](https://docs.cypress.io/). Ils s'exécutent sur des services en mémoire (`src/services/memory/`), sans Firebase. Le plan de test est dans [`docs/tests/plan-de-test.md`](docs/tests/plan-de-test.md).
+
+```bash
+pnpm e2e        # suite complète en ligne de commande
+pnpm e2e:open   # interface Cypress
+```
+
+Un workflow GitHub Actions (`.github/workflows/e2e.yml`) lance la suite à chaque push sur `main` et à chaque pull request.

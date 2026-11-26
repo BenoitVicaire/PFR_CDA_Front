@@ -1,3 +1,4 @@
 allowBuilds:
   '@firebase/util': true
+  cypress: true
   protobufjs: true

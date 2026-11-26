@@ -92,13 +92,13 @@ export function BudgetsListPage() {
 					to="/budgets"
 					className="flex items-center gap-3 rounded-xl border border-warning bg-warning-100 px-3.5 py-3 mt-4"
 				>
-					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-white">
+					<span className="flex shrink-0 items-center justify-center rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-warning-foreground">
 						!
 					</span>
 					<p className="flex-1 text-sm font-medium text-primary">
 						2 catégories en dépassement
 					</p>
-					<span className="shrink-0 text-xs font-semibold text-warning">
+					<span className="shrink-0 text-xs font-semibold text-warning-700">
 						Voir →
 					</span>
 				</Link>
