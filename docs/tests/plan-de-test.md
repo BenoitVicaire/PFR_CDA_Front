@@ -1,16 +1,16 @@
-# Plan de test : fonctionnalité fil rouge « Opérations »
+# Plan de test : Budget Perso, fonctionnalité fil rouge « Opérations »
 
 | | |
 |---|---|
 | Projet | Budget Perso (frontend) |
-| Périmètre | Saisie, modification, suppression et consultation des opérations |
+| Périmètre | Opérations (fil rouge) et non-régression du reste du frontend |
 | Niveau de test | Bout en bout (E2E) |
 | Outil | Cypress 16 |
-| Version du document | 1.0 |
+| Version du document | 2.0 (26/11/2026) |
 
 ## 1. Objet
 
-Ce document décrit comment la fonctionnalité centrale de l'application, la gestion des opérations (revenus et dépenses), est vérifiée, et pourquoi ces choix ont été faits. Il sert de base à la suite de la démarche qualité : les cas de test sont identifiés, rattachés aux exigences, puis automatisés.
+Ce document décrit comment la fonctionnalité centrale de l'application, la gestion des opérations (revenus et dépenses), et les parcours qui l'entourent sont vérifiés, et pourquoi ces choix ont été faits. Il sert de base à la suite de la démarche qualité : les cas de test sont identifiés, rattachés aux exigences, puis automatisés.
 
 ## 2. Périmètre
 
@@ -18,21 +18,26 @@ Ce document décrit comment la fonctionnalité centrale de l'application, la ges
 
 | Exigence | User story | Contenu |
 |---|---|---|
-| EF-A02 | US-002 | Connexion, prérequis de tout le parcours |
+| EF-A01, EF-C02 | US-001, US-011 | Inscription et création des 12 catégories par défaut |
+| EF-A02 | US-002 | Connexion, retour vers la page demandée, déconnexion sur mobile |
 | EF-B01 | US-006 | Saisie d'une opération |
 | EF-B02 | US-007, US-008 | Modification et suppression d'une opération |
 | EF-B03 | US-009 | Liste, filtres, tri et pagination |
-| EF-E01 | US-016 | Répercussion des saisies sur les alertes de budget du dashboard |
-| ENF-U04 | | Accessibilité WCAG 2.1 AA des écrans du fil rouge |
+| | US-014 | Un seul budget par catégorie et par mois |
+| EF-E01 | US-016 | Alertes de budget : répercussion des saisies, détail des dépassements |
+| EF-G02 | US-022 | Accès aux documents légaux |
+| ENF-F03 | | Signalement des erreurs de chargement et de suppression |
+| ENF-U01, ENF-U04 | | Accessibilité WCAG 2.1 AA des écrans |
+| ENF-C02 | | Affichage et navigation sur petit écran |
 
 ### 2.2 Hors périmètre de cette version
 
-- Inscription, réinitialisation du mot de passe, suppression de compte et export RGPD.
-- Gestion des catégories personnalisées et création de budgets.
+- Réinitialisation du mot de passe, suppression de compte et export RGPD.
+- Gestion des catégories personnalisées, modification d'un budget et création réussie d'un budget.
 - Recherche dans les libellés (EF-B04), non encore développée.
 - Purge des opérations supprimées au bout de 30 jours (traitement côté serveur).
 - Tests de performance (ENF01, ENF02).
-- Accessibilité des écrans hors fil rouge (catégories, budgets, statistiques, profil).
+- Intégration réelle avec Firebase (authentification, persistance, règles de sécurité).
 - Tests d'API : le backend Laravel n'existe pas encore.
 
 ## 3. Stratégie de test
@@ -53,9 +58,11 @@ Conséquences :
 - ils survivent à la migration vers Laravel, puisque seule la couche de services change ;
 - ils ne valident pas l'intégration réelle avec Firebase ou Laravel, ce qui relève d'un niveau de test ultérieur (voir section 9).
 
+Pour tester les pannes, un test peut poser le drapeau `window.e2eFailServices` : les services en mémoire lèvent alors une erreur, comme le ferait une coupure réseau ou un refus de droits (voir `src/services/memory/store.ts`).
+
 ### 3.3 Accessibilité automatisée
 
-Les contrôles génériques d'accessibilité reposent sur axe-core (Deque), branché à Cypress par `cypress-axe`. Chaque écran du fil rouge est analysé selon les règles WCAG 2.1 niveaux A et AA : noms accessibles des boutons et champs, labels de formulaires, rôles ARIA, hiérarchie des titres, langue de la page, contraste des couleurs.
+Les contrôles génériques d'accessibilité reposent sur axe-core (Deque), branché à Cypress par `cypress-axe`. Les écrans sont analysés selon les règles WCAG 2.1 niveaux A et AA : noms accessibles des boutons et champs, labels de formulaires, rôles ARIA, hiérarchie des titres, langue de la page, contraste des couleurs.
 
 Un outil automatique détecte une partie seulement des défauts d'accessibilité. Il est complété par un test de navigation au clavier (ordre de tabulation du formulaire). Le jugement humain reste nécessaire pour le sens des textes alternatifs et la pertinence de l'ordre de lecture.
 
@@ -70,7 +77,7 @@ Un outil automatique détecte une partie seulement des défauts d'accessibilité
 | Élément | Valeur |
 |---|---|
 | Navigateurs | Chrome et Firefox (CI), au choix en local |
-| Résolution | 1280 x 800 (navigation de bureau) |
+| Résolution | 1280 x 800 (bureau) ; 375 x 812 (mobile) et 320 x 640 (plus petit écran visé) pour les cas qui le précisent |
 | URL | `http://localhost:5173` (serveur Vite en mode `e2e`) |
 | Compte de test | `marc@example.com` (défini dans `src/services/memory/seed.ts`) |
 
@@ -95,6 +102,9 @@ Légende de la colonne « Type » : N nominal, E erreur ou refus, L limite.
 | CT-AUTH-01 | US-002 | N | Se connecter avec des identifiants valides | Redirection vers `/dashboard` | `auth.cy.ts` |
 | CT-AUTH-02 | US-002 | E | Se connecter avec un mauvais mot de passe | Message générique « Email ou mot de passe incorrect. », l'utilisateur reste sur `/connexion` | `auth.cy.ts` |
 | CT-AUTH-03 | EF-A02 | E | Ouvrir `/operations` sans être connecté | Redirection vers `/connexion` avec le paramètre `redirect` | `auth.cy.ts` |
+| CT-AUTH-04 | US-001, EF-C02 | N | S'inscrire avec une nouvelle adresse | Redirection vers `/dashboard`, la page Catégories liste 12 catégories | `auth.cy.ts` |
+| CT-AUTH-05 | US-001, EF-C02 | E | Provoquer une panne pendant l'inscription, puis réessayer | Message d'erreur, l'utilisateur reste sur `/inscription` ; la même adresse reste utilisable | `auth.cy.ts` |
+| CT-AUTH-06 | US-002, EF-A02 | N | Ouvrir `/operations` sans être connecté, puis se connecter | Retour sur `/operations` | `auth.cy.ts` |
 
 ### 5.2 Saisie d'une opération
 
@@ -108,6 +118,9 @@ Préconditions communes : utilisateur connecté, formulaire `/operations/new` ou
 | CT-OP-04 | EF-B01 | E | Valider sans choisir de catégorie | Message « Catégorie requise », pas d'enregistrement | `operations-create.cy.ts` |
 | CT-OP-05 | US-006 | L | Saisir une date dans deux ans (prévisionnel) | Opération acceptée et visible avec sa date | `operations-create.cy.ts` |
 | CT-OP-06 | US-006 | N | Remplir le formulaire puis annuler | Retour à la liste, aucune opération créée | `operations-create.cy.ts` |
+| CT-OP-18 | EF-B01 | L | Ouvrir le formulaire à 00 h 30, heure locale | La date proposée est celle du jour local, pas la date UTC | `operations-create.cy.ts` |
+| CT-OP-19 | EF-B01 | N | Choisir une catégorie de dépense, puis passer en « Revenus » | La sélection est effacée, seules les catégories de revenu sont proposées | `operations-create.cy.ts` |
+| CT-OP-20 | US-006, EF-B01 | E | Saisir une date dans six ans | Message « La date doit être à 5 ans près d'aujourd'hui », pas d'enregistrement | `operations-create.cy.ts` |
 
 ### 5.3 Modification et suppression
 
@@ -141,7 +154,37 @@ Préconditions communes : utilisateur connecté, page `/operations` affichée av
 | CT-BUD-01 | US-016 | L | Saisir 120 € en Alimentation (plafond 100 €) | Le dashboard affiche « 1 catégorie en dépassement » | `operations-dashboard.cy.ts` |
 | CT-BUD-02 | US-016 | L | Saisir 85 € en Alimentation (85 % du plafond) | Le dashboard affiche « 1 catégorie à surveiller » | `operations-dashboard.cy.ts` |
 
-### 5.6 Accessibilité
+### 5.6 Budgets
+
+| ID | Exigence | Type | Scénario | Résultat attendu | Spec |
+|---|---|---|---|---|---|
+| CT-BUD-03 | US-016 | N | Ouvrir la liste des budgets sans dépassement | Aucune alerte de dépassement | `budgets.cy.ts` |
+| CT-BUD-04 | US-016, EF-E01 | N | Dépasser un budget puis ouvrir le détail de l'alerte | Fenêtre titrée « Alertes de budget », ligne à 120 %, pas de tableau vide, aucune violation axe | `budgets.cy.ts` |
+| CT-BUD-05 | US-014 | E | Créer un second budget pour la même catégorie et le même mois | Message « Un budget existe déjà », pas d'enregistrement | `budgets.cy.ts` |
+
+### 5.7 Erreurs de chargement et de suppression
+
+Préconditions communes : utilisateur connecté, panne simulée avant l'action.
+
+| ID | Exigence | Type | Scénario | Résultat attendu | Spec |
+|---|---|---|---|---|---|
+| CT-ERR-01 | ENF-F03 | E | Ouvrir la page Budgets | Message d'erreur et bouton « Réessayer », aucun budget affiché | `errors.cy.ts` |
+| CT-ERR-02 | ENF-F03 | E | Supprimer un budget | « La suppression a échoué », l'utilisateur reste sur la page | `errors.cy.ts` |
+| CT-ERR-03 | ENF-F03 | E | Ouvrir le dashboard, les opérations ou les catégories (3 exécutions) | Message d'erreur propre à la page et bouton « Réessayer » | `errors.cy.ts` |
+| CT-ERR-04 | ENF-F03 | E | Supprimer une opération | « La suppression a échoué », l'utilisateur reste sur la page | `errors.cy.ts` |
+
+### 5.8 Navigation, liens légaux et petits écrans
+
+| ID | Exigence | Type | Scénario | Résultat attendu | Spec |
+|---|---|---|---|---|---|
+| CT-NAV-01 | ENF-C02 | N | Sur mobile, passer par le menu vers Catégories puis Statistiques | Les deux pages s'ouvrent | `navigation.cy.ts` |
+| CT-NAV-02 | ENF-C02, EF-A02 | N | Sur mobile, se déconnecter par le menu | Redirection vers `/connexion` | `navigation.cy.ts` |
+| CT-LEG-01 | US-022, EF-G02 | N | Lire le consentement à l'inscription | Liens vers les mentions légales et la politique de confidentialité | `legal.cy.ts` |
+| CT-LEG-02 | US-022, EF-G02 | N | Ouvrir la connexion puis l'espace privé | Pied de page avec les liens légaux | `legal.cy.ts` |
+| CT-RESP-01 | ENF-C02 | L | Afficher la liste des opérations à 320 px | Aucun défilement horizontal du tableau, montants et pagination à l'écran | `responsive.cy.ts` |
+| CT-RESP-02 | ENF-C02 | L | Afficher les budgets à 320 px | Le bouton « Ajouter un budget » reste à l'écran | `responsive.cy.ts` |
+
+### 5.9 Accessibilité
 
 | ID | Exigence | Type | Scénario | Résultat attendu | Spec |
 |---|---|---|---|---|---|
@@ -158,6 +201,19 @@ Préconditions communes : utilisateur connecté, page `/operations` affichée av
 | CT-A11Y-11 | ENF-U04 | N | Contrôler le contraste de la modale de suppression | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 | CT-A11Y-12 | ENF-U04 | L | Contrôler le contraste du dashboard avec un budget à 85 % (alerte « à surveiller ») | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
 | CT-A11Y-13 | ENF-U04 | L | Contrôler le contraste de la liste des budgets avec un budget à 85 % | Ratio d'au moins 4,5:1 | `accessibility.cy.ts` |
+| CT-A11Y-14 | ENF-U01 | N | Inspecter le sélecteur de mois du formulaire de budget | Le bouton est relié au libellé « Mois » | `accessibility.cy.ts` |
+
+Les cas suivants analysent les règles WCAG 2.1 A et AA, contraste compris.
+
+| ID | Exigence | Type | Scénario | Résultat attendu | Spec |
+|---|---|---|---|---|---|
+| CT-A11Y-15 | ENF-U01 | N | Pages publiques : accueil, inscription, mot de passe oublié et réinitialisation, mentions légales, confidentialité, page introuvable, page d'erreur (8 exécutions) | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-16 | ENF-U01 | N | Catégories, statistiques, budgets (3 exécutions) | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-17 | ENF-U01 | N | Création d'un budget, sélecteur de mois fermé puis ouvert | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-18 | ENF-U01 | N | Modification d'un budget | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-19 | ENF-U01 | E | Messages de validation de l'inscription | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-20 | ENF-U01 | N | Sur mobile, dashboard puis page Profil atteinte par le menu | Aucune violation | `accessibility-screens.cy.ts` |
+| CT-A11Y-21 | ENF-U01 | E | Message d'échec de chargement | Aucune violation | `accessibility-screens.cy.ts` |
 
 ## 6. Critères d'entrée et de sortie
 
@@ -177,7 +233,9 @@ Sortie (version livrable) :
 | `pnpm e2e:open` | Ouvre l'interface Cypress pour exécuter et déboguer les tests |
 | `pnpm e2e -- --browser firefox` | Exécution sur un autre navigateur |
 
-Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suite sur Chrome et Firefox à chaque push sur `main` et à chaque pull request. En cas d'échec, les captures d'écran sont conservées comme artefact du run.
+Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suite sur Chrome et Firefox à chaque push sur `main` et à chaque pull request. En cas d'échec, les captures d'écran sont conservées comme artefact du run. Sur `main`, une exécution est annulée si une fusion plus récente arrive avant sa fin.
+
+En local, `pnpm e2e` utilise Electron : un succès local ne garantit pas le succès sur Chrome et Firefox. La CI de la pull request doit être verte avant la fusion.
 
 ## 8. Écarts constatés et limites
 
@@ -189,14 +247,17 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 | ENF-U04 | Le contrôle de contraste a révélé des textes sous le ratio 4,5:1 exigé par WCAG AA : `--muted-foreground` (#9E9E9E, 2,7:1 sur blanc), le orange d'avertissement utilisé comme couleur de texte (#E68A00, 2,6:1) et `--destructive` sur fond gris (#D93636 sur #F5F5F5, 4,3:1). | Corrigé dans `src/index.css` : `--muted-foreground` #666666 (5,3:1 sur #F5F5F5) et `--destructive` #C62828 (5,2:1). Pour le orange, deux tokens distincts : `--warning-500` #E68A00 conservé pour les fonds, barres et bordures, `--warning-700` #9A5700 pour le texte sur fond clair (5,1:1 sur #FFF3E0) et `--warning-foreground` #3B2300 pour le texte posé sur un fond orange (5,6:1). Les tokens de la maquette P4-05 sont à mettre à jour en conséquence. |
 | ENF-U04 | Une première correction avait assombri le orange pour tous ses usages : les badges et barres de budget devenaient bruns et leur texte illisible. Détecté à la relecture visuelle, pas par axe, qui ne juge que les ratios. | Séparation des tokens (voir ligne précédente) et ajout de CT-A11Y-12 et CT-A11Y-13 sur l'état « à surveiller ». Le contrôle visuel reste nécessaire en complément. |
 | ENF-U04 | Les barres de progression des budgets n'avaient pas de nom accessible. | Corrigé : `aria-label` ajouté sur le dashboard et sur les cartes de budget. |
-| Général | Les données sont en mémoire : aucun test ne valide la persistance réelle. | Voir section 9. |
+| Général | Les données sont en mémoire : aucun test ne valide la persistance réelle. L'écriture groupée des catégories et la suppression du compte après un échec d'inscription ne sont testées que sur le service en mémoire. | À vérifier à la main avec Firebase. Voir section 9. |
+| EF-C02 | La suppression d'une catégorie par défaut est refusée par le service, mais aucun écran de suppression n'existe et les règles Firestore ne l'interdisent pas côté serveur. | Pas de cas de test pour le moment. La protection côté serveur est à prévoir avec l'API. |
+| ENF-C02 | À 320 px, une première correction validée par la mesure laissait le symbole « € » coupé dans la liste, et la fenêtre d'alertes débordait. Détecté sur captures d'écran. | Corrigé ; CT-RESP-01 contrôle l'absence de défilement dans le tableau. La fenêtre d'alertes n'a pas de cas automatisé à 320 px. |
+| Général | La CI est passée au rouge quand l'image GitHub a adopté Chrome 158, que Cypress 16.2.0 ne gérait pas (`* is not a valid URL`). Les contrôles locaux ne pouvaient pas le détecter. | Cypress monté en 16.3.0. |
 
 ## 9. Évolutions prévues
 
-1. Extension de l'analyse d'accessibilité aux écrans hors fil rouge (catégories, budgets, statistiques, profil).
+1. Tests d'intégration avec les émulateurs Firebase, tant que Firebase reste le backend.
 2. Tests unitaires (Vitest) de la logique pure : calcul des seuils de budget (`getStatus`, `groupBudgetsByAlert`), conversion des montants en centimes, schémas Zod.
 3. Tests d'API (PHPUnit) sur le backend Laravel, puis quelques parcours E2E exécutés contre l'API réelle.
-4. Extension à l'inscription, aux catégories et aux budgets.
+4. Extension à la gestion des catégories, à la modification des budgets et au profil.
 
 ## 10. Résultats d'exécution
 
@@ -204,3 +265,7 @@ Intégration continue : le workflow `.github/workflows/e2e.yml` exécute la suit
 |---|---|---|
 | Locale, 19/10/2026 | Windows, Electron (headless), `pnpm e2e` | 22 cas sur 22 passés, durée d'environ 1 minute |
 | Intégration continue, PR n°1 | Ubuntu, Chrome et Firefox | 22 cas sur 22 passés sur les deux navigateurs |
+| Locale, 26/11/2026 | Windows, Electron et Chrome 157 (headless) | 73 exécutions sur 73 passées sur chaque navigateur, moins de 2 minutes par campagne |
+| Intégration continue, `main` après la PR n°85 | Ubuntu, Chrome et Firefox | Succès sur les deux navigateurs |
+
+Les 73 exécutions correspondent à 62 identifiants : CT-ERR-03, CT-A11Y-15 et CT-A11Y-16 sont rejoués sur plusieurs pages.
