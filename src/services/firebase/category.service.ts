@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc, writeBatch } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, updateDoc, writeBatch } from "firebase/firestore"
 
 import { db } from "@/lib/firebase"
 import type { CategoryService } from "@/services/category-service"
@@ -29,6 +29,9 @@ export const firebaseCategoryService: CategoryService = {
   },
 
   async delete(userId, categoryId) {
-    await deleteDoc(doc(db, "users", userId, "categories", categoryId))
+    const reference = doc(db, "users", userId, "categories", categoryId)
+    const snapshot = await getDoc(reference)
+    if (snapshot.data()?.isDefault) throw new Error("Une catégorie par défaut ne peut pas être supprimée")
+    await deleteDoc(reference)
   },
 }

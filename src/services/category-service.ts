@@ -6,5 +6,6 @@ export interface CategoryService {
   /** Crée plusieurs catégories en une seule écriture : toutes ou aucune. */
   createMany(userId: string, data: Omit<Category, "id">[]): Promise<void>
   update(userId: string, categoryId: string, data: Partial<Omit<Category, "id">>): Promise<void>
+  /** Refusé pour une catégorie par défaut (EF-C02) : elle reste seulement modifiable. */
   delete(userId: string, categoryId: string): Promise<void>
 }

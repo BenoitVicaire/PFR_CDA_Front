@@ -24,6 +24,9 @@ export const firebaseCategoryService: CategoryService = {
 
   async delete(userId, categoryId) {
     const data = getUserData(userId)
+    if (data.categories.find((item) => item.id === categoryId)?.isDefault) {
+      throw new Error("Une catégorie par défaut ne peut pas être supprimée")
+    }
     data.categories = data.categories.filter((item) => item.id !== categoryId)
   },
 }
