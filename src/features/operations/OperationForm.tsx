@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
+  MAX_DATE,
+  MIN_DATE,
   operationSchema,
   type OperationFormInput,
   type OperationFormValues,
@@ -15,16 +17,7 @@ import {
 import { useCategories } from "@/hooks/useCategories"
 import { toLocalDate } from "@/lib/date"
 
-
-function shiftYears(years: number) {
-  const date = new Date()
-  date.setFullYear(date.getFullYear() + years)
-  return toLocalDate(date)
-}
-
 const TODAY = toLocalDate()
-const MIN_DATE = shiftYears(-5)
-const MAX_DATE = shiftYears(5)
 
 interface OperationFormProps {
   defaultValues?: Partial<OperationFormInput>
