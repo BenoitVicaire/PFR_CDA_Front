@@ -57,14 +57,15 @@ export function BudgetsListPage() {
 				</h1>
 
 				{/* Option de la table et boutons */}
-				<div className="flex items-center gap-3 mt-6">
+				{/* flex-wrap : sur petit écran les boutons passent à la ligne (ENF-C02). */}
+				<div className="flex flex-wrap items-center gap-3 mt-6">
 					<MonthPicker
 						value={monthFilter}
 						onChange={updateMonthFilter}
 					/>
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<span tabIndex={0} className="ml-auto inline-block">
+							<span tabIndex={0} className="inline-block sm:ml-auto">
 								<Button
 									variant="outline"
 									// onClick={handleCarryOver} 
