@@ -1,4 +1,4 @@
-import { ChevronDown, Menu } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from "recharts"
 
 import { LoadError } from "@/components/LoadError"
@@ -128,11 +128,7 @@ export function DashboardPage() {
 	
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-4 px-4 py-3">
-      <div className="flex items-center justify-between py-2 md:hidden">
-        <Menu className="size-6 text-primary" />
-        <p className="text-lg font-medium text-primary">Budget Perso</p>
-        <div className="size-7 rounded-full bg-muted" />
-      </div>
+
 	  {loading?(
 		<Spinner className="size-6 text-primary" />
 	  ): error ? (
