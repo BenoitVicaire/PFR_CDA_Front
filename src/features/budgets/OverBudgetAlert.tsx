@@ -40,8 +40,8 @@ function BudgetAlertTable({ title, icon: Icon, titleClassName, budgets, operatio
 				<TableHeader className="[&_th]:text-muted-foreground">
 					<TableRow>
 						<TableHead>Catégorie</TableHead>
-						<TableHead className="text-right">Dépensé</TableHead>
-						<TableHead className="text-right">Plafond</TableHead>
+						<TableHead className="hidden text-right sm:table-cell">Dépensé</TableHead>
+						<TableHead className="hidden text-right sm:table-cell">Plafond</TableHead>
 						<TableHead className="text-right">Consommé</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -50,9 +50,15 @@ function BudgetAlertTable({ title, icon: Icon, titleClassName, budgets, operatio
 						const spentCents = getSpentCents(budget, operations);
 						return (
 							<TableRow key={budget.id}>
-								<TableCell>{categoryById.get(budget.categoryId)?.name}</TableCell>
-								<TableCell className="text-right">{formatCents(spentCents)}</TableCell>
-								<TableCell className="text-right">{formatCents(budget.capCents)}</TableCell>
+								<TableCell>
+									{categoryById.get(budget.categoryId)?.name}
+									{/* Sous 640 px, les montants passent sous le nom pour tenir à l'écran (ENF-C02). */}
+									<span className="block text-xs text-muted-foreground sm:hidden">
+										{formatCents(spentCents)} sur {formatCents(budget.capCents)}
+									</span>
+								</TableCell>
+								<TableCell className="hidden text-right sm:table-cell">{formatCents(spentCents)}</TableCell>
+								<TableCell className="hidden text-right sm:table-cell">{formatCents(budget.capCents)}</TableCell>
 								<TableCell className={cn("text-right font-semibold", titleClassName)}>
 									{Math.round((spentCents / budget.capCents) * 100)} %
 								</TableCell>
@@ -102,7 +108,8 @@ export function OverBudgetAlert({ over, warning, operations }: OverBudgetAlertPr
 					<span className="shrink-0 text-xs font-semibold text-warning-700">Voir →</span>
 				</button>
 			</DialogTrigger>
-			<DialogContent>
+			{/* grid-cols-1 : empêche un contenu large d'élargir la fenêtre au-delà de l'écran. */}
+			<DialogContent className="grid-cols-1">
 				<DialogHeader>
 					<DialogTitle>Alertes de budget</DialogTitle>
 					<DialogDescription>Budgets dépassés ou proches de leur plafond.</DialogDescription>

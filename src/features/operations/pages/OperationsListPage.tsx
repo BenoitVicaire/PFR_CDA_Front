@@ -150,23 +150,29 @@ export function OperationsListPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>Catégorie</TableHead>
-                  <TableHead>Libellé</TableHead>
+                  <TableHead className="hidden sm:table-cell">Catégorie</TableHead>
+                  <TableHead className="hidden sm:table-cell">Libellé</TableHead>
                   <TableHead className="text-right">Montant</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pageItems.map((operation) => (
                   <TableRow key={operation.id}>
-                    <TableCell>
+                    {/* max-w-0 w-full : sur mobile la colonne prend la place restante et son texte est tronqué. */}
+                    <TableCell className="w-full max-w-0 sm:w-auto sm:max-w-none">
                       <Link to={`/operations/${operation.id}`} className="block font-medium text-primary">
                         {operation.date}
                       </Link>
+                      {/* Sous 640 px, catégorie et libellé passent sous la date pour garder le montant visible. */}
+                      <span className="block truncate text-xs text-muted-foreground sm:hidden">
+                        {categoryById.get(operation.categoryId)?.name ?? "—"}
+                        {operation.label ? ` · ${operation.label}` : ""}
+                      </span>
                     </TableCell>
-                    <TableCell className="font-medium text-primary">
+                    <TableCell className="hidden font-medium text-primary sm:table-cell">
                       {categoryById.get(operation.categoryId)?.name ?? "—"}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{operation.label || "—"}</TableCell>
+                    <TableCell className="hidden text-muted-foreground sm:table-cell">{operation.label || "—"}</TableCell>
                     <TableCell
                       className={`text-right font-semibold ${operation.type === "income" ? "text-success" : "text-destructive"}`}
                     >
@@ -185,7 +191,7 @@ export function OperationsListPage() {
               </TableBody>
             </Table>
 
-            <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
               <p className="font-medium text-primary">
                 Total :{" "}
                 <span className={total >= 0 ? "text-success" : "text-destructive"}>
