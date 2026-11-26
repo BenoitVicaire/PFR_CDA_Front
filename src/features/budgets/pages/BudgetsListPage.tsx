@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BudgetElement } from "../BudgetElement";
 import { useAuth } from "@/hooks/useAuth";
+import { toLocalMonth } from "@/lib/date";
 import { firebaseOperationService } from "@/services/firebase/operation.service";
 import type { Operation } from "@/types/operation";
 import { getSpentCents, groupBudgetsByAlert } from "../budget-utils";
@@ -18,7 +19,7 @@ export function BudgetsListPage() {
 	const [operations, setOperations] = useState<Operation[]>([])
 	const [loading, setLoading] = useState(true)
 	const [budgets, setBudgets] = useState<Budget[]>([])
-	const currentMonth = new Date().toISOString().slice(0, 7); // "2026-10"
+	const currentMonth = toLocalMonth()
 	const [error, setError] = useState<string | null>(null)
 
 	const [monthFilter, setMonthFilter] = useState<string>(currentMonth);
