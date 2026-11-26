@@ -60,6 +60,21 @@ describe("Opérations : saisie (US-006, EF-B01)", () => {
   })
 })
 
+describe("Opérations : catégories selon le type (EF-B01)", () => {
+  it("CT-OP-19 : ne propose que les catégories du type choisi et oublie l'ancien choix", () => {
+    cy.login()
+    cy.navigateTo("Opérations")
+    cy.contains("a", "Ajouter").click()
+    cy.selectOption("#categoryId", "Alimentation")
+
+    cy.contains("label", "Revenus").click()
+    cy.get("#categoryId").should("contain", "Sélectionner").click()
+
+    cy.contains('[role="option"]', "Salaire").should("exist")
+    cy.contains('[role="option"]', "Alimentation").should("not.exist")
+  })
+})
+
 describe("Opérations : date par défaut (EF-B01)", () => {
   it("CT-OP-18 : propose la date locale, même juste après minuit", () => {
     // 1er juin 2026 à 00 h 30 heure locale : la date UTC est encore le 31 mai en France.
