@@ -21,7 +21,7 @@ function BudgetBalance({status, remainingCents}: BudgetBalanceProps){
 	const MESSAGES = {
 		ok: `${formatCents(remainingCents)} restants`,
 		warning: "Budget presque atteint",
-		over: `Dépassement : +${formatCents(remainingCents)}`,
+		over: `Dépassement : +${formatCents(Math.abs(remainingCents))}`,
 	}
 	
 	const {icon : Icon, text} = STATUS_UI[status]
