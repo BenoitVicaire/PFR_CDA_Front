@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Règles de sécurité Firestore : chaque utilisateur n'accède qu'à ses propres données.
+// Toutes les données sont rangées sous users/{userId}/ (categories, operations, budgets).
+// Tout chemin non listé ici est refusé par défaut.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
