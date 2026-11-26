@@ -8,6 +8,7 @@ import { AuthContext, type AuthContextValue } from "./auth-context"
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [registering, setRegistering] = useState(false)
 
   useEffect(() => {
     return firebaseAuthService.onAuthStateChanged((nextUser) => {
@@ -16,11 +17,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  async function register(email: string, password: string, displayName: string) {
+    setRegistering(true)
+    try {
+      // onAuthStateChanged ne se redéclenche pas quand le nom est ajouté : on le reprend ici.
+      setUser(await firebaseAuthService.register(email, password, displayName))
+    } finally {
+      setRegistering(false)
+    }
+  }
+
   const value: AuthContextValue = {
     user,
     loading,
+    registering,
     login: firebaseAuthService.login,
-    register: firebaseAuthService.register,
+    register,
     logout: firebaseAuthService.logout,
     sendPasswordReset: firebaseAuthService.sendPasswordReset,
   }

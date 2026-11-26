@@ -5,6 +5,8 @@ import type { User } from "@/types"
 export interface AuthContextValue {
   user: User | null
   loading: boolean
+  /** true pendant l'inscription : le compte est connecté mais pas encore prêt. */
+  registering: boolean
   login: (email: string, password: string, options?: { rememberMe?: boolean }) => Promise<void>
   register: (email: string, password: string, displayName: string) => Promise<void>
   logout: () => Promise<void>

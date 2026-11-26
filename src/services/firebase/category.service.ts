@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc, writeBatch } from "firebase/firestore"
 
 import { db } from "@/lib/firebase"
 import type { CategoryService } from "@/services/category-service"
@@ -16,6 +16,12 @@ export const firebaseCategoryService: CategoryService = {
 
   async create(userId, data) {
     await addDoc(categoriesRef(userId), data)
+  },
+
+  async createMany(userId, data) {
+    const batch = writeBatch(db)
+    data.forEach((category) => batch.set(doc(categoriesRef(userId)), category))
+    await batch.commit()
   },
 
   async update(userId, categoryId, data) {
