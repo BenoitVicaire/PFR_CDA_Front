@@ -3,7 +3,8 @@ import type { CategoryService } from "@/services/category-service"
 
 // EF-C02 : 12 catégories par défaut créées automatiquement à l'inscription.
 export async function seedDefaultCategories(categoryService: CategoryService, userId: string) {
-  for (const category of DEFAULT_CATEGORIES) {
-    await categoryService.create(userId, { ...category, isDefault: true })
-  }
+  await categoryService.createMany(
+    userId,
+    DEFAULT_CATEGORIES.map((category) => ({ ...category, isDefault: true }))
+  )
 }

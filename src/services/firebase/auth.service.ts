@@ -2,6 +2,7 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
@@ -35,8 +36,15 @@ export const firebaseAuthService: AuthService = {
 
   async register(email, password, displayName) {
     const credential = await createUserWithEmailAndPassword(auth, email, password)
-    await updateProfile(credential.user, { displayName })
-    await seedDefaultCategories(firebaseCategoryService, credential.user.uid)
+    try {
+      await updateProfile(credential.user, { displayName })
+      await seedDefaultCategories(firebaseCategoryService, credential.user.uid)
+    } catch (error) {
+      // On garde l'erreur d'origine même si la suppression du compte échoue aussi.
+      await deleteUser(credential.user).catch(() => {})
+      throw error
+    }
+    return toUser(credential.user)
   },
 
   async login(email, password, options) {

@@ -12,6 +12,10 @@ export const firebaseCategoryService: CategoryService = {
     getUserData(userId).categories.push({ ...data, id: nextId("cat") })
   },
 
+  async createMany(userId, data) {
+    getUserData(userId).categories.push(...data.map((category) => ({ ...category, id: nextId("cat") })))
+  },
+
   async update(userId, categoryId, data) {
     const category = getUserData(userId).categories.find((item) => item.id === categoryId)
     if (!category) throw new Error("Catégorie introuvable")

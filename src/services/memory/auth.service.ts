@@ -51,8 +51,16 @@ export const firebaseAuthService: AuthService = {
     }
     const user: User = { id: nextId("user"), email, displayName, currency: "EUR" }
     accounts.set(email, { user, password })
-    await seedDefaultCategories(firebaseCategoryService, user.id)
+    // Comme Firebase : l'utilisateur est connecté dès la création du compte, avant les catégories.
     setCurrentUser(user)
+    try {
+      await seedDefaultCategories(firebaseCategoryService, user.id)
+    } catch (error) {
+      accounts.delete(email)
+      setCurrentUser(null)
+      throw error
+    }
+    return user
   },
 
   async login(email, password) {
