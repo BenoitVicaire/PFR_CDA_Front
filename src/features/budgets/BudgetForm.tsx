@@ -24,6 +24,7 @@ import {
 	type BudgetFormInput,
 	type BudgetFormValues,
 } from "./schemas";
+import { DuplicateBudgetError } from "./errors";
 import { useState } from "react";
 import { MonthPicker } from "@/components/MonthPicker";
 import {
@@ -62,8 +63,10 @@ export function BudgetForm({
 		setFormError(null);
 		try {
 			await onSubmit(values);
-		} catch {
-			setFormError("Une erreur est survenue, réessaie.");
+		} catch (error) {
+			setFormError(
+				error instanceof DuplicateBudgetError ? error.message : "Une erreur est survenue, réessaie.",
+			);
 		}
 	}
 
