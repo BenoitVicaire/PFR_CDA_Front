@@ -41,7 +41,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center bg-background px-6 pt-15 pb-10">
+    <div className="flex flex-1 flex-col items-center px-6 pt-15 pb-10">
       <div className="flex w-full max-w-sm flex-col items-center gap-7">
         <div className="flex flex-col items-center gap-6">
           <Logo />
@@ -135,8 +135,13 @@ export function RegisterPage() {
                   )}
                 />
                 <span>
-                  J'accepte les mentions légales et la{" "}
-                  <Link to="/politique-confidentialite" className="underline">
+                  J'accepte les{" "}
+                  {/* Nouvel onglet : lire un document ne vide pas le formulaire. */}
+                  <Link to="/mentions-legales" target="_blank" className="underline">
+                    mentions légales
+                  </Link>{" "}
+                  et la{" "}
+                  <Link to="/politique-confidentialite" target="_blank" className="underline">
                     politique de confidentialité
                   </Link>
                   .
